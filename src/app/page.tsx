@@ -13,6 +13,7 @@ import { ShareButton } from '@/components/ShareButton';
 import { ExternalButton } from '@/components/ExternalButton';
 import { VersionSwitcher } from '@/components/VersionSwitcher';
 import { v4 as uuidv4 } from 'uuid';
+import toast from 'react-hot-toast';
 
 interface HistoryEntry {
   html: string;
@@ -50,6 +51,21 @@ export default function Home() {
       });
 
       const data = await response.json();
+      
+      if (!response.ok) {
+        if (response.status === 400 && data.category) {
+          toast.error(
+            <div>
+              <p>{data.error}</p>
+              <p className="text-sm text-gray-500 mt-1">Category: {data.category}</p>
+            </div>,
+            { duration: 5000 }
+          );
+          return;
+        }
+        throw new Error('Failed to generate HTML');
+      }
+      
       if (data.html) {
         const version = (history.length + 1).toString();
         const newEntry: HistoryEntry = { 
@@ -101,6 +117,21 @@ export default function Home() {
         });
 
         const data = await response.json();
+        
+        if (!response.ok) {
+          if (response.status === 400 && data.category) {
+            toast.error(
+              <div>
+                <p>{data.error}</p>
+                <p className="text-sm text-gray-500 mt-1">Category: {data.category}</p>
+              </div>,
+              { duration: 5000 }
+            );
+            return;
+          }
+          throw new Error('Failed to generate HTML');
+        }
+        
         if (data.html) {
           const version = (history.length + 1).toString();
           const newEntry: HistoryEntry = { 
