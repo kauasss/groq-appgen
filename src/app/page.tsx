@@ -35,9 +35,12 @@ export default function Home() {
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [sessionId] = useState(() => uuidv4());
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isApplying, setIsApplying] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const generateHtml = async () => {
+    setIsGenerating(true);
     try {
       const response = await fetch('/api/generate', {
         method: 'POST',
@@ -91,20 +94,24 @@ export default function Home() {
       }
     } catch (error) {
       console.error('Error:', error);
+      toast.error('Failed to generate HTML');
+    } finally {
+      setIsGenerating(false);
     }
   };
 
   const submitFeedback = async () => {
-    if (currentFeedback.trim()) {
-      // Update history entry with new feedback
-      const updatedHistory = [...history];
-      updatedHistory[historyIndex] = {
-        ...updatedHistory[historyIndex],
-        feedback: currentFeedback.trim()
-      };
-      setHistory(updatedHistory);
-      
-      try {
+    setIsApplying(true);
+    try {
+      if (currentFeedback.trim()) {
+        // Update history entry with new feedback
+        const updatedHistory = [...history];
+        updatedHistory[historyIndex] = {
+          ...updatedHistory[historyIndex],
+          feedback: currentFeedback.trim()
+        };
+        setHistory(updatedHistory);
+        
         const response = await fetch('/api/generate', {
           method: 'POST',
           headers: {
@@ -153,9 +160,12 @@ export default function Home() {
             body: data.html
           });
         }
-      } catch (error) {
-        console.error('Error:', error);
       }
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('Failed to apply edit');
+    } finally {
+      setIsApplying(false);
     }
   };
 
@@ -226,11 +236,15 @@ export default function Home() {
               }}
             />
             <button
-              disabled={false}
-              className={`px-4 py-2 text-white rounded-lg bg-[#F55036] hover:bg-[#D93D26] focus:outline-none focus:ring-2 focus:ring-[#FF7B66] focus:ring-opacity-50 whitespace-nowrap`}
+              disabled={(mode === 'query' && (!query.trim() || isGenerating)) || (mode === 'feedback' && isApplying)}
+              className={`px-4 py-2 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF7B66] focus:ring-opacity-50 whitespace-nowrap transition-all duration-200 ${
+                isGenerating || isApplying 
+                  ? 'loading-animation'
+                  : 'bg-[#F55036] hover:bg-[#D93D26]'
+              }`}
               onClick={mode === 'query' ? generateHtml : submitFeedback}
             >
-              {mode === 'query' ? 'Generate' : 'Apply edit'}
+              {mode === 'query' ? (isGenerating ? 'Generating...' : 'Generate') : (isApplying ? 'Applying...' : 'Apply edit')}
             </button>
             <button
               onClick={() => setIsOverlayOpen(!isOverlayOpen)}
