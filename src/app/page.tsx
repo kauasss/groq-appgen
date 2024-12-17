@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, Suspense } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { vscDarkPlus } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import { vs } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { constructPrompt } from "@/utils/prompt";
 import { IoChevronBackOutline, IoChevronForwardOutline } from "react-icons/io5";
@@ -328,7 +329,7 @@ function HomeContent() {
 					<div className="relative h-full">
 						<SyntaxHighlighter
 							language="html"
-							style={vs}
+							style={vscDarkPlus}
 							className="h-full rounded"
 							customStyle={{ margin: 0, height: "100%", width: "100%" }}
 						>
@@ -368,7 +369,7 @@ function HomeContent() {
 						<iframe
 							ref={iframeRef}
 							srcDoc={currentHtml}
-							className="w-full h-full border rounded bg-white shadow-sm"
+							className="w-full h-full border rounded bg-background shadow-sm"
 							style={{ minHeight: "100%", minWidth: "100%" }}
 							scrolling="no"
 							sandbox="allow-scripts"
@@ -378,7 +379,7 @@ function HomeContent() {
 
 				{/* Sliding Debug Overlay */}
 				<div
-					className={`fixed top-0 right-0 h-screen w-[60vw] bg-white shadow-lg transform transition-transform duration-300 overflow-hidden z-50 ${isOverlayOpen ? "translate-x-0" : "translate-x-full"}`}
+					className={`fixed top-0 right-0 h-screen w-[60vw] bg-background shadow-lg transform transition-transform duration-300 overflow-hidden z-50 ${isOverlayOpen ? "translate-x-0" : "translate-x-full"}`}
 				>
 					<div className="h-full flex flex-col p-4">
 						<div className="flex justify-between items-center mb-4 flex-shrink-0">
@@ -390,7 +391,7 @@ function HomeContent() {
 								✕
 							</button>
 						</div>
-						<pre className="flex-1 text-sm bg-gray-100 p-4 rounded overflow-auto">
+						<pre className="flex-1 text-sm bg-background p-4 rounded overflow-auto">
 							{getFormattedOutput()}
 						</pre>
 					</div>
