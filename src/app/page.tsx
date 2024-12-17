@@ -14,6 +14,7 @@ import { ExternalButton } from '@/components/ExternalButton';
 import { VersionSwitcher } from '@/components/VersionSwitcher';
 import { v4 as uuidv4 } from 'uuid';
 import toast from 'react-hot-toast';
+import { useSearchParams } from 'next/navigation';
 
 interface HistoryEntry {
   html: string;
@@ -27,6 +28,7 @@ interface HistoryEntry {
 }
 
 export default function Home() {
+  const searchParams = useSearchParams();
   const [query, setQuery] = useState('');
   const [currentHtml, setCurrentHtml] = useState('');
   const [currentFeedback, setCurrentFeedback] = useState('');
@@ -196,6 +198,36 @@ export default function Home() {
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, []);
+
+  useEffect(() => {
+    const source = searchParams.get('source');
+    if (source) {
+      const loadSourceVersion = async () => {
+        try {
+          const response = await fetch(`/api/apps/${source}`);
+          if (!response.ok) {
+            throw new Error('Failed to load source version');
+          }
+          const html = await response.text();
+          const [sourceSessionId, sourceVersion] = source.split('/');
+          const newEntry: HistoryEntry = {
+            html,
+            feedback: '',
+            sessionId,
+            version: '1'
+          };
+          setHistory([newEntry]);
+          setHistoryIndex(0);
+          setCurrentHtml(html);
+          setMode('feedback');
+        } catch (error) {
+          console.error('Error loading source version:', error);
+          toast.error('Failed to load source version');
+        }
+      };
+      loadSourceVersion();
+    }
+  }, [searchParams]);
 
   return (
     <main className="h-screen flex flex-col overflow-hidden">

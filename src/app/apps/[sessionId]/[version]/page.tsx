@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { RemixButton } from '@/components/RemixButton';
 
 export default function SharedApp({
   params,
@@ -27,7 +28,7 @@ export default function SharedApp({
   }, [params.sessionId, params.version]);
 
   return (
-    <div className="w-screen h-screen">
+    <div className="w-screen h-screen relative">
       <iframe 
         srcDoc={html}
         className="w-full h-full border-0"
@@ -35,6 +36,12 @@ export default function SharedApp({
         style={{ height: '100vh' }}
         scrolling='no'
       />
+      <div className="absolute bottom-6 right-6 flex gap-2 z-10">
+        <RemixButton
+          sessionId={params.sessionId}
+          version={params.version}
+        />
+      </div>
     </div>
   );
 }

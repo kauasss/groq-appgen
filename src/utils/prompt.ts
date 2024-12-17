@@ -12,7 +12,7 @@ export function constructPrompt(data: PromptData): string {
 ${currentFeedback ? `<feedback>${currentFeedback}</feedback>` : ''}
 ${!hasFeedback && query ? `<query>Generate a single HTML file based on this query: "${query}"</query>` : ''}
 ${`<output instructions>
-The output should be valid HTML and should be creative and well-structured.
+The output should be valid HTML and should be creative and well-structured. Use Tailwind CSS, load it in the <head> tag with <script src="https://cdn.tailwindcss.com"></script>.
 Return the HTML content wrapped in triple backticks with 'html' language specifier, like this:
 \`\`\`html
 <your html code here>
