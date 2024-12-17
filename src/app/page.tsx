@@ -248,7 +248,7 @@ export default function Home() {
             </button>
             <button
               onClick={() => setIsOverlayOpen(!isOverlayOpen)}
-              className="px-4 py-2 border border-gray-300 text-gray-600 rounded hover:bg-gray-100 whitespace-nowrap"
+              className="hidden lg:block px-4 py-2 border border-gray-300 text-gray-600 rounded hover:bg-gray-100 whitespace-nowrap"
             >
               Show prompt
             </button>
