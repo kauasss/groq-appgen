@@ -336,7 +336,7 @@ export default function Home() {
         <div className="flex items-center justify-start text-sm text-gray-600">
             {history[historyIndex]?.usage && (
               <span>
-                {(history[historyIndex].usage.total_time * 1000).toFixed(0)}ms • {Math.round(history[historyIndex].usage.total_tokens / history[historyIndex].usage.total_time)} tokens/sec
+                {(history[historyIndex].usage.total_time * 1000).toFixed(0)}ms • {Math.round(history[historyIndex].usage.total_tokens / history[historyIndex].usage.total_time)} tokens/sec • <a className='underline' href="https://console.groq.com/docs/models">llama-3.3-70b-specdec</a>
               </span>
             )}
           </div>
