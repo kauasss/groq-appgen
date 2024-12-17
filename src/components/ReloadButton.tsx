@@ -1,4 +1,4 @@
-import { RefObject } from "react";
+import type { RefObject } from "react";
 import { IoReloadOutline } from "react-icons/io5";
 import { Tooltip } from "react-tooltip";
 import { Button } from "./ui/button";
