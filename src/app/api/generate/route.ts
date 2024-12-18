@@ -49,7 +49,7 @@ async function getDrawingDescription(imageData: string): Promise<string> {
         }
       ],
       model: "llama-3.2-90b-vision-preview",
-      temperature: 1,
+      temperature: 0.7,
       max_tokens: 1024,
       top_p: 1,
       stream: false,

@@ -5,25 +5,9 @@ import { Input } from "@/components/ui/input";
 import { useStudio } from "@/providers/studio-provider";
 import { DrawingCanvas } from "@/components/DrawingCanvas";
 import { useState } from "react";
+import { APP_EXAMPLES } from "@/data/app-examples";
 
-const APP_SUGGESTIONS = [
-	"Calculator",
-	"Todo List",
-	"Weather App",
-	"Quiz App",
-	"Snake Game",
-	"Note Taker",
-	"Recipe Finder",
-	"Chatbot",
-	"Alien Shooter Game",
-	"Image Gallery",
-	"Music Player",
-	"Video Player",
-	"Calendar",
-	"Task Manager",
-	"Expense Tracker",
-	"Budget Planner",
-];
+const APP_SUGGESTIONS = APP_EXAMPLES.map(example => example.label);
 
 export default function PromptView() {
 	const { setStudioMode, query, setQuery, setTriggerGeneration, drawingData, setDrawingData } = useStudio();
@@ -41,7 +25,8 @@ export default function PromptView() {
 	};
 
 	const handleSuggestionClick = (suggestion: string) => () => {
-		setQuery(suggestion);
+		const example = APP_EXAMPLES.find(ex => ex.label === suggestion);
+		setQuery(example?.prompt || suggestion);
 		setStudioMode(true);
 		setTriggerGeneration(true);
 	};
