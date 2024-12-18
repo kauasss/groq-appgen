@@ -26,7 +26,7 @@ export default function RootLayout({
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
 					{children}
 					{/* <ModeToggle /> */}
-					<Toaster position="bottom-right" />
+					{/* <Toaster position="bottom-right" /> */}
 				</ThemeProvider>
 			</body>
 		</html>

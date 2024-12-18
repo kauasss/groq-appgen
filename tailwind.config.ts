@@ -48,6 +48,10 @@ const config: Config = {
 					DEFAULT: "hsl(var(--destructive))",
 					foreground: "hsl(var(--destructive-foreground))",
 				},
+				groq: {
+					DEFAULT: "#F55036",
+					foreground: "#fff",
+				},
 				border: "hsl(var(--border))",
 				input: "hsl(var(--input))",
 				ring: "hsl(var(--ring))",

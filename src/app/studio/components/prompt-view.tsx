@@ -1,4 +1,4 @@
-import { useState } from "react";
+import AppLogo from "@/components/app-logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useStudio } from "@/providers/studio-provider";
@@ -8,12 +8,12 @@ const suggestions = [
 	"Todo List",
 	"Weather App",
 	"Quiz App",
+	"Snake Game",
 	"Note Taker",
 	"Recipe Finder",
 	"Chatbot",
 	"Image Gallery",
 	"Music Player",
-	"Video Player",
 	"Calendar",
 	"Task Manager",
 	"Expense Tracker",
@@ -36,11 +36,14 @@ export default function PromptView() {
 	};
 
 	return (
-		<div className="flex flex-col gap-6 items-center justify-center h-screen">
-			<div className="flex flex-col gap-3 items-center justify-center min-w-[30%]">
-				<h1 className="text-[3em] font-montserrat mb-10">Start a mini-app</h1>
+		<div className="flex flex-col gap-6 items-center justify-center h-screen relative">
+			<AppLogo className="top-10 absolute" />
+			<div className="flex flex-col gap-3 items-center justify-center  md:w-[30%]">
+				<h1 className="text-[1.5em] md:text-[3em] font-montserrat mb-10">
+					Start a mini-app
+				</h1>
 				<form
-					className="flex row gap-3 items-center justify-center w-full border-border border-solid border-2 rounded-full p-2 focus-within:border-primary "
+					className="flex row gap-3 items-center justify-center md:w-[400px] border-border border-solid border-2 rounded-full p-2 focus-within:border-primary"
 					onSubmit={handleSubmit}
 				>
 					<Input
@@ -53,7 +56,7 @@ export default function PromptView() {
 					<Button className="rounded-full">Create</Button>
 				</form>
 			</div>
-			<div className="flex row flex-wrap gap-3 items-center justify-center w-[30%] ">
+			<div className="flex row flex-wrap gap-3 items-center justify-center max-w-[90%] md:w-[30%] ">
 				{suggestions.map((suggestion) => (
 					<Button
 						key={suggestion}

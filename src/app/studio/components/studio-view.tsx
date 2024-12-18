@@ -10,9 +10,18 @@ import { ShareButton } from "@/components/ShareButton";
 import { ExternalButton } from "@/components/ExternalButton";
 import { VersionSwitcher } from "@/components/VersionSwitcher";
 import { v4 as uuidv4 } from "uuid";
-import toast from "react-hot-toast";
 import { useSearchParams } from "next/navigation";
 import { useStudio } from "@/providers/studio-provider";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Ellipsis, Plus, X } from "lucide-react";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import toast from "react-hot-toast";
 
 interface HistoryEntry {
 	html: string;
@@ -35,8 +44,13 @@ export default function StudioView() {
 
 function HomeContent() {
 	const searchParams = useSearchParams();
-	const { query, setQuery, triggerGeneration, setTriggerGeneration } =
-		useStudio();
+	const {
+		query,
+		setQuery,
+		triggerGeneration,
+		setTriggerGeneration,
+		setStudioMode,
+	} = useStudio();
 	const [currentHtml, setCurrentHtml] = useState("");
 	const [currentFeedback, setCurrentFeedback] = useState("");
 	const [isOverlayOpen, setIsOverlayOpen] = useState(false);
@@ -267,6 +281,16 @@ function HomeContent() {
 
 					{/* Main Input Row */}
 					<div className="flex items-center gap-4">
+						<Button
+							className="flex items-center gap-2"
+							onClick={() => {
+								setStudioMode(false);
+								setQuery("");
+							}}
+						>
+							<Plus size={16} />
+							New
+						</Button>
 						{/* Version Switcher - Only visible on desktop */}
 						<VersionSwitcher
 							className="lg:flex hidden"
@@ -276,7 +300,7 @@ function HomeContent() {
 							onNext={() => navigateHistory("next")}
 						/>
 
-						<input
+						<Input
 							type="text"
 							value={mode === "query" ? query : currentFeedback}
 							onChange={(e) =>
@@ -297,12 +321,12 @@ function HomeContent() {
 								}
 							}}
 						/>
-						<button
+						<Button
 							disabled={
 								(mode === "query" && (!query.trim() || isGenerating)) ||
 								(mode === "feedback" && isApplying)
 							}
-							className={`px-4 py-2 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF7B66] focus:ring-opacity-50 whitespace-nowrap transition-all duration-200 ${
+							className={`bg-groq text-groq-foreground transition-all duration-200 ${
 								isGenerating || isApplying
 									? "loading-animation"
 									: "bg-[#F55036] hover:bg-[#D93D26]"
@@ -316,13 +340,21 @@ function HomeContent() {
 								: isApplying
 									? "Applying..."
 									: "Apply edit"}
-						</button>
-						<button
-							onClick={() => setIsOverlayOpen(!isOverlayOpen)}
-							className="hidden lg:block px-4 py-2 border border-gray-300 text-gray-600 rounded hover:bg-gray-100 whitespace-nowrap"
-						>
-							Show prompt
-						</button>
+						</Button>
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<Button variant="outline">
+									<Ellipsis size={16} />
+								</Button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent>
+								<DropdownMenuItem
+									onClick={() => setIsOverlayOpen(!isOverlayOpen)}
+								>
+									Show prompt
+								</DropdownMenuItem>
+							</DropdownMenuContent>
+						</DropdownMenu>
 					</div>
 				</div>
 			</div>
@@ -372,6 +404,7 @@ function HomeContent() {
 							/>
 						</div>
 						<iframe
+							title="Studio Preview"
 							ref={iframeRef}
 							srcDoc={currentHtml}
 							className="w-full h-full border rounded bg-background shadow-sm"
@@ -389,12 +422,14 @@ function HomeContent() {
 					<div className="h-full flex flex-col p-4">
 						<div className="flex justify-between items-center mb-4 flex-shrink-0">
 							<h2 className="font-medium">Prompt</h2>
-							<button
+							<Button
+								variant="ghost"
+								size="icon"
 								onClick={() => setIsOverlayOpen(false)}
 								className="text-gray-500 hover:text-gray-700"
 							>
-								✕
-							</button>
+								<X size={16} />
+							</Button>
 						</div>
 						<pre className="flex-1 text-sm bg-background p-4 rounded overflow-auto">
 							{getFormattedOutput()}
