@@ -16,7 +16,7 @@ export function RemixButton({
 	const handleClick = () => {
 		if (sessionId && version) {
 			const sourceParam = `${sessionId}/${version}`;
-			window.location.href = `/?source=${encodeURIComponent(sourceParam)}`;
+			window.location.href = `/studio/?source=${encodeURIComponent(sourceParam)}`;
 		}
 	};
 

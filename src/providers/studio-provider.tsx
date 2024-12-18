@@ -26,7 +26,7 @@ const [StudioProvider, useStudio] = providerFactory(() => {
 	const [mode, setMode] = useState<"query" | "feedback">("query");
 	const [history, setHistory] = useState<HistoryEntry[]>([]);
 	const [historyIndex, setHistoryIndex] = useState(-1);
-	const [sessionId] = useState(() => uuidv4());
+	const [sessionId, setSessionId] = useState(() => uuidv4());
 	const [isGenerating, setIsGenerating] = useState(false);
 	const [isApplying, setIsApplying] = useState(false);
 	const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -233,6 +233,7 @@ const [StudioProvider, useStudio] = providerFactory(() => {
 		getFormattedOutput,
 		iframeRef,
 		sessionId,
+		setSessionId,
 	};
 });
 

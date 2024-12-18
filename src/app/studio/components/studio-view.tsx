@@ -41,11 +41,13 @@ function HomeContent() {
 		setCurrentHtml,
 		setMode,
 		sessionId,
+		setStudioMode,
 	} = useStudio();
 
 	useEffect(() => {
 		const source = searchParams.get("source");
 		if (source) {
+			console.log("source", source);
 			const loadSourceVersion = async () => {
 				try {
 					const response = await fetch(`/api/apps/${source}`);
@@ -64,6 +66,7 @@ function HomeContent() {
 					setHistoryIndex(0);
 					setCurrentHtml(html);
 					setMode("feedback");
+					setStudioMode(true);
 				} catch (error) {
 					console.error("Error loading source version:", error);
 					toast.error("Failed to load source version");

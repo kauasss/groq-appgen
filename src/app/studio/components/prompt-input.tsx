@@ -13,7 +13,7 @@ export function PromptInput() {
 		submitFeedback,
 	} = useStudio();
 	return (
-		<div className=" flex items-center gap-2 flex-1 border-border border-2 focus-within:border-groq rounded-full p-1">
+		<div className=" flex items-center gap-2 flex-1 border-border border focus-within:border-groq rounded-full p-1">
 			<Input
 				autoFocus
 				type="text"
