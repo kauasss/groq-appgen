@@ -6,11 +6,19 @@ import { useStudio } from "@/providers/studio-provider";
 import { DrawingCanvas } from "@/components/DrawingCanvas";
 import { useState } from "react";
 import { APP_EXAMPLES } from "@/data/app-examples";
+import { Pencil } from "lucide-react";
 
-const APP_SUGGESTIONS = APP_EXAMPLES.map(example => example.label);
+const APP_SUGGESTIONS = APP_EXAMPLES.map((example) => example.label);
 
 export default function PromptView() {
-	const { setStudioMode, query, setQuery, setTriggerGeneration, drawingData, setDrawingData } = useStudio();
+	const {
+		setStudioMode,
+		query,
+		setQuery,
+		setTriggerGeneration,
+		drawingData,
+		setDrawingData,
+	} = useStudio();
 	const [showDrawing, setShowDrawing] = useState(false);
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -25,7 +33,7 @@ export default function PromptView() {
 	};
 
 	const handleSuggestionClick = (suggestion: string) => () => {
-		const example = APP_EXAMPLES.find(ex => ex.label === suggestion);
+		const example = APP_EXAMPLES.find((ex) => ex.label === suggestion);
 		setQuery(example?.prompt || suggestion);
 		setStudioMode(true);
 		setTriggerGeneration(true);
@@ -50,7 +58,7 @@ export default function PromptView() {
 					</h2>
 				</div>
 				<form
-					className="flex row gap-3 items-center justify-center w-full border-border border-solid border-2 rounded-full p-2 focus-within:border-groq"
+					className="flex row gap-2 items-center justify-center w-full border-border border-solid border-2 rounded-full p-2 focus-within:border-groq"
 					onSubmit={handleSubmit}
 				>
 					<Input
@@ -60,13 +68,14 @@ export default function PromptView() {
 						className="w-full max-w-md border-0 md:text-lg p-3 bg-transparent shadow-none focus:outline-none focus:border-0 focus:ring-0 focus-visible:ring-0 focus-visible:border-0"
 						placeholder="Describe your app..."
 					/>
-					<Button 
-						type="button" 
-						variant="outline"
-						className="rounded-full"
+					<Button
+						type="button"
+						variant="ghost"
+						size="icon"
+						className="rounded-full relative z-10 shrink-0 hidden md:flex"
 						onClick={() => setShowDrawing(true)}
 					>
-						{drawingData ? "Edit Drawing" : "Draw"}
+						{drawingData ? "Edit Drawing" : <Pencil className="h-5 w-5" />}
 					</Button>
 					<MicrophoneButton onTranscription={handleTranscription} />
 					<Button className="rounded-full" type="submit">
