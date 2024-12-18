@@ -35,7 +35,6 @@ export default function SharedApp({
 				title="Shared App"
 				srcDoc={html}
 				className="w-full h-full border-0"
-				sandbox="allow-scripts allow-forms"
 				style={{ height: "100vh" }}
 				scrolling="no"
 			/>

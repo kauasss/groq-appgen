@@ -166,7 +166,6 @@ function HomeContent() {
 							className="w-full h-full border rounded bg-background shadow-sm"
 							style={{ minHeight: "100%", minWidth: "100%" }}
 							scrolling="no"
-							sandbox="allow-scripts allow-same-origin"
 						/>
 					</div>
 				</div>
