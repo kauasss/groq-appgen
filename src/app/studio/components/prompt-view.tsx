@@ -43,7 +43,7 @@ export default function PromptView() {
 					Start a mini-app
 				</h1>
 				<form
-					className="flex row gap-3 items-center justify-center md:w-[400px] border-border border-solid border-2 rounded-full p-2 focus-within:border-primary"
+					className="flex row gap-3 items-center justify-center md:w-[400px] border-border border-solid border-2 rounded-full p-2 focus-within:border-groq"
 					onSubmit={handleSubmit}
 				>
 					<Input

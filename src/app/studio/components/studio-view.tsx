@@ -1,19 +1,21 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import { CopyButton } from "@/components/CopyButton";
 import { ReloadButton } from "@/components/ReloadButton";
 import { ShareButton } from "@/components/ShareButton";
 import { ExternalButton } from "@/components/ExternalButton";
-import { useStudio } from "@/providers/studio-provider";
+import { type HistoryEntry, useStudio } from "@/providers/studio-provider";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { VersionSwitcher } from "./version-switcher";
 import { NewButton } from "./new-button";
 import { PromptInput } from "./prompt-input";
 import { OptionsButton } from "./options-button";
+import { useSearchParams } from "next/navigation";
+import { toast } from "react-hot-toast";
 
 export default function StudioView() {
 	return (
@@ -24,6 +26,7 @@ export default function StudioView() {
 }
 
 function HomeContent() {
+	const searchParams = useSearchParams();
 	const {
 		history,
 		historyIndex,
@@ -33,7 +36,42 @@ function HomeContent() {
 		setIsOverlayOpen,
 		getFormattedOutput,
 		iframeRef,
+		setHistory,
+		setHistoryIndex,
+		setCurrentHtml,
+		setMode,
+		sessionId,
 	} = useStudio();
+
+	useEffect(() => {
+		const source = searchParams.get("source");
+		if (source) {
+			const loadSourceVersion = async () => {
+				try {
+					const response = await fetch(`/api/apps/${source}`);
+					if (!response.ok) {
+						throw new Error("Failed to load source version");
+					}
+					const html = await response.text();
+					const [sourceSessionId, sourceVersion] = source.split("/");
+					const newEntry: HistoryEntry = {
+						html,
+						feedback: "",
+						sessionId,
+						version: "1",
+					};
+					setHistory([newEntry]);
+					setHistoryIndex(0);
+					setCurrentHtml(html);
+					setMode("feedback");
+				} catch (error) {
+					console.error("Error loading source version:", error);
+					toast.error("Failed to load source version");
+				}
+			};
+			loadSourceVersion();
+		}
+	}, [searchParams]);
 
 	return (
 		<main className="h-screen flex flex-col overflow-hidden">

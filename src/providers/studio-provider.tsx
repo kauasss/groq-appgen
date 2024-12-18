@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import { useSearchParams } from "next/navigation";
 import { constructPrompt } from "@/utils/prompt";
 
-interface HistoryEntry {
+export interface HistoryEntry {
 	html: string;
 	feedback: string;
 	usage?: {
@@ -17,7 +17,6 @@ interface HistoryEntry {
 }
 
 const [StudioProvider, useStudio] = providerFactory(() => {
-	const searchParams = useSearchParams();
 	const [query, setQuery] = useState("");
 	const [studioMode, setStudioMode] = useState(false);
 	const [triggerGeneration, setTriggerGeneration] = useState(false);
@@ -199,36 +198,6 @@ const [StudioProvider, useStudio] = providerFactory(() => {
 	}, []);
 
 	useEffect(() => {
-		const source = searchParams.get("source");
-		if (source) {
-			const loadSourceVersion = async () => {
-				try {
-					const response = await fetch(`/api/apps/${source}`);
-					if (!response.ok) {
-						throw new Error("Failed to load source version");
-					}
-					const html = await response.text();
-					const [sourceSessionId, sourceVersion] = source.split("/");
-					const newEntry: HistoryEntry = {
-						html,
-						feedback: "",
-						sessionId,
-						version: "1",
-					};
-					setHistory([newEntry]);
-					setHistoryIndex(0);
-					setCurrentHtml(html);
-					setMode("feedback");
-				} catch (error) {
-					console.error("Error loading source version:", error);
-					toast.error("Failed to load source version");
-				}
-			};
-			loadSourceVersion();
-		}
-	}, [searchParams]);
-
-	useEffect(() => {
 		if (triggerGeneration) {
 			setTriggerGeneration(false);
 			generateHtml();
@@ -263,6 +232,7 @@ const [StudioProvider, useStudio] = providerFactory(() => {
 		submitFeedback,
 		getFormattedOutput,
 		iframeRef,
+		sessionId,
 	};
 });
 
