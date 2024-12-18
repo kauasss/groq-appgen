@@ -2,7 +2,10 @@
 
 import { Suspense, useEffect } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { vscDarkPlus, vs } from "react-syntax-highlighter/dist/cjs/styles/prism";
+import {
+	vscDarkPlus,
+	vs,
+} from "react-syntax-highlighter/dist/cjs/styles/prism";
 import { CopyButton } from "@/components/CopyButton";
 import { ReloadButton } from "@/components/ReloadButton";
 import { ShareButton } from "@/components/ShareButton";
@@ -122,7 +125,7 @@ function HomeContent() {
 					<div className="relative h-full">
 						<SyntaxHighlighter
 							language="html"
-							style={resolvedTheme === 'dark' ? vscDarkPlus : vs}
+							style={resolvedTheme === "dark" ? vscDarkPlus : vs}
 							className="h-full rounded"
 							customStyle={{ margin: 0, height: "100%", width: "100%" }}
 						>
@@ -139,6 +142,14 @@ function HomeContent() {
 					<div className="h-full p-4 relative">
 						<div className="absolute top-6 right-6 flex gap-2 z-10">
 							<ReloadButton iframeRef={iframeRef} />
+							<ExternalButton
+								sessionId={history[historyIndex]?.sessionId}
+								version={history[historyIndex]?.version}
+								disabled={
+									!history[historyIndex]?.sessionId ||
+									!history[historyIndex]?.version
+								}
+							/>
 							<ShareButton
 								sessionId={history[historyIndex]?.sessionId}
 								version={history[historyIndex]?.version}
@@ -150,19 +161,11 @@ function HomeContent() {
 									// The HTML is already saved when generated
 								}}
 							/>
-							<ExternalButton
-								sessionId={history[historyIndex]?.sessionId}
-								version={history[historyIndex]?.version}
-								disabled={
-									!history[historyIndex]?.sessionId ||
-									!history[historyIndex]?.version
-								}
-							/>
 						</div>
 						<iframe
 							title="Studio Preview"
 							ref={iframeRef}
-							srcDoc={`<style>body{background-color:${resolvedTheme === 'dark' ? 'rgb(30 30 30)' : '#ffffff'};margin:0;}</style>${currentHtml}`}
+							srcDoc={`<style>body{background-color:${resolvedTheme === "dark" ? "rgb(30 30 30)" : "#ffffff"};margin:0;}</style>${currentHtml}`}
 							className="w-full h-full border rounded bg-background shadow-sm"
 							style={{ minHeight: "100%", minWidth: "100%" }}
 							scrolling="no"

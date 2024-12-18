@@ -32,7 +32,6 @@ export function ShareButton({
 				onClick={handleShare}
 				disabled={disabled}
 				variant="outline"
-				size="icon"
 				data-tooltip-id="share-tooltip"
 				data-tooltip-content={
 					shared
@@ -42,7 +41,7 @@ export function ShareButton({
 							: "Share this page"
 				}
 			>
-				<IoShareOutline size={20} />
+				<IoShareOutline size={20} /> Share
 			</Button>
 			<Tooltip
 				id="share-tooltip"
