@@ -197,7 +197,7 @@ function HomeContent() {
 				<div className="w-1/2 pr-4 pb-4 border-r">
 					<div className="flex items-center justify-end text-sm text-gray-600">
 						<span>Powered by</span>
-						<AppLogo className="ml-2 scale-75" />
+						<AppLogo className="scale-75" size={100} />
 					</div>
 				</div>
 				{/* Right column */}

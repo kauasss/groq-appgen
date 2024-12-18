@@ -46,7 +46,7 @@ export default function PromptView() {
 
 	return (
 		<div className="flex flex-col gap-6 items-center justify-center h-screen relative">
-			<AppLogo className="top-10 absolute" />
+			<AppLogo className="top-10 absolute" size={120} />
 			<div className="flex flex-col gap-3 items-center justify-center min-w-[30%]">
 				<div>
 					<h1 className="text-[3em] font-montserrat text-center">
