@@ -28,12 +28,53 @@ async function checkContentSafety(content: string): Promise<{ safe: boolean; cat
   }
 }
 
+async function getDrawingDescription(imageData: string): Promise<string> {
+  try {
+    const chatCompletion = await client.chat.completions.create({
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: "Describe this UI drawing in detail"
+            },
+            {
+              type: "image_url",
+              image_url: {
+                url: imageData
+              }
+            }
+          ]
+        }
+      ],
+      model: "llama-3.2-90b-vision-preview",
+      temperature: 1,
+      max_tokens: 1024,
+      top_p: 1,
+      stream: false,
+      stop: null
+    });
+
+    return chatCompletion.choices[0].message.content;
+  } catch (error) {
+    console.error('Error processing drawing:', error);
+    throw error;
+  }
+}
+
 export async function POST(request: Request) {
   try {
-    const { query, currentHtml, feedback, theme } = await request.json();
+    const { query, currentHtml, feedback, theme, drawingData } = await request.json();
+
+    let finalQuery = query;
+    if (drawingData) {
+      const drawingDescription = await getDrawingDescription(drawingData);
+      finalQuery = `${query}\n\nDrawing description: ${drawingDescription}`;
+    }
 
     const prompt = constructPrompt({
-      ...(query && { query }),
+      ...(finalQuery && { query: finalQuery }),
       currentHtml,
       currentFeedback: feedback,
       theme

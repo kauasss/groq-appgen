@@ -3,6 +3,8 @@ import { MicrophoneButton } from "@/components/MicrophoneButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useStudio } from "@/providers/studio-provider";
+import { DrawingCanvas } from "@/components/DrawingCanvas";
+import { useState } from "react";
 
 const APP_SUGGESTIONS = [
 	"Calculator",
@@ -24,12 +26,18 @@ const APP_SUGGESTIONS = [
 ];
 
 export default function PromptView() {
-	const { setStudioMode, query, setQuery, setTriggerGeneration } = useStudio();
+	const { setStudioMode, query, setQuery, setTriggerGeneration, drawingData, setDrawingData } = useStudio();
+	const [showDrawing, setShowDrawing] = useState(false);
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setStudioMode(true);
 		setTriggerGeneration(true);
+	};
+
+	const handleDrawingComplete = async (imageData: string) => {
+		setDrawingData(imageData);
+		setShowDrawing(false);
 	};
 
 	const handleSuggestionClick = (suggestion: string) => () => {
@@ -67,12 +75,26 @@ export default function PromptView() {
 						className="w-full max-w-md border-0 md:text-lg p-3 bg-transparent shadow-none focus:outline-none focus:border-0 focus:ring-0 focus-visible:ring-0 focus-visible:border-0"
 						placeholder="Describe your app..."
 					/>
+					<Button 
+						type="button" 
+						variant="outline"
+						className="rounded-full"
+						onClick={() => setShowDrawing(true)}
+					>
+						{drawingData ? "Edit Drawing" : "Draw"}
+					</Button>
 					<MicrophoneButton onTranscription={handleTranscription} />
 					<Button className="rounded-full" type="submit">
 						Create
 					</Button>
 				</form>
 			</div>
+			{showDrawing && (
+				<DrawingCanvas
+					onDrawingComplete={handleDrawingComplete}
+					onClose={() => setShowDrawing(false)}
+				/>
+			)}
 			<div className="flex row flex-wrap gap-3 items-center justify-center w-[90%] md:w-[60%] lg:w-[30%]">
 				{APP_SUGGESTIONS.map((suggestion) => (
 					<Button

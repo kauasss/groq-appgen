@@ -29,6 +29,7 @@ const [StudioProvider, useStudio] = providerFactory(() => {
 	const [sessionId, setSessionId] = useState(() => uuidv4());
 	const [isGenerating, setIsGenerating] = useState(false);
 	const [isApplying, setIsApplying] = useState(false);
+	const [drawingData, setDrawingData] = useState<string | null>(null);
 	const iframeRef = useRef<HTMLIFrameElement>(null);
 	const { resolvedTheme } = useTheme();
 
@@ -44,6 +45,7 @@ const [StudioProvider, useStudio] = providerFactory(() => {
 					query,
 					currentHtml,
 					theme: resolvedTheme,
+					drawingData,
 				}),
 			});
 
@@ -82,6 +84,7 @@ const [StudioProvider, useStudio] = providerFactory(() => {
 				setHistoryIndex(newHistory.length - 1);
 				setCurrentHtml(data.html);
 				setMode("feedback");
+				setDrawingData(null); // Clear drawing data after successful generation
 
 				// Save the HTML to the server
 				await fetch(`/api/apps/${sessionId}/${version}`, {
@@ -238,6 +241,8 @@ const [StudioProvider, useStudio] = providerFactory(() => {
 		iframeRef,
 		sessionId,
 		setSessionId,
+		drawingData,
+		setDrawingData,
 	};
 });
 
