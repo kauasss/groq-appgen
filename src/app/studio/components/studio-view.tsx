@@ -7,18 +7,13 @@ import { CopyButton } from "@/components/CopyButton";
 import { ReloadButton } from "@/components/ReloadButton";
 import { ShareButton } from "@/components/ShareButton";
 import { ExternalButton } from "@/components/ExternalButton";
-import { VersionSwitcher } from "@/components/VersionSwitcher";
-
 import { useStudio } from "@/providers/studio-provider";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Ellipsis, Plus, X } from "lucide-react";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { X } from "lucide-react";
+import { VersionSwitcher } from "./version-switcher";
+import { NewButton } from "./new-button";
+import { PromptInput } from "./prompt-input";
+import { OptionsButton } from "./options-button";
 
 export default function StudioView() {
 	return (
@@ -30,22 +25,12 @@ export default function StudioView() {
 
 function HomeContent() {
 	const {
-		query,
-		setQuery,
-		setStudioMode,
 		history,
 		historyIndex,
 		navigateHistory,
-		mode,
 		currentHtml,
-		currentFeedback,
-		setCurrentFeedback,
 		isOverlayOpen,
 		setIsOverlayOpen,
-		isGenerating,
-		isApplying,
-		generateHtml,
-		submitFeedback,
 		getFormattedOutput,
 		iframeRef,
 	} = useStudio();
@@ -56,26 +41,21 @@ function HomeContent() {
 			<div className="p-4 bg-background border-b flex-shrink-0">
 				<div className="flex flex-col gap-4">
 					{/* Version Switcher - Separate row on mobile */}
-					<VersionSwitcher
-						className="lg:hidden justify-center"
-						currentVersion={historyIndex + 1}
-						totalVersions={history.length}
-						onPrevious={() => navigateHistory("prev")}
-						onNext={() => navigateHistory("next")}
-					/>
+					<div className="flex justify-center lg:hidden">
+						<NewButton />
+						<VersionSwitcher
+							className="lg:hidden justify-center flex-1"
+							currentVersion={historyIndex + 1}
+							totalVersions={history.length}
+							onPrevious={() => navigateHistory("prev")}
+							onNext={() => navigateHistory("next")}
+						/>
+						<OptionsButton />
+					</div>
 
 					{/* Main Input Row */}
 					<div className="flex items-center gap-4">
-						<Button
-							className="flex items-center gap-2"
-							onClick={() => {
-								setStudioMode(false);
-								setQuery("");
-							}}
-						>
-							<Plus size={16} />
-							New
-						</Button>
+						<NewButton className="hidden lg:flex" />
 						{/* Version Switcher - Only visible on desktop */}
 						<VersionSwitcher
 							className="lg:flex hidden"
@@ -85,61 +65,8 @@ function HomeContent() {
 							onNext={() => navigateHistory("next")}
 						/>
 
-						<Input
-							type="text"
-							value={mode === "query" ? query : currentFeedback}
-							onChange={(e) =>
-								mode === "query"
-									? setQuery(e.target.value)
-									: setCurrentFeedback(e.target.value)
-							}
-							className="flex-1 p-2 border rounded"
-							placeholder={
-								mode === "query"
-									? "Describe your app..."
-									: "Enter your feedback..."
-							}
-							onKeyDown={(e) => {
-								if (e.key === "Enter" && !e.shiftKey) {
-									e.preventDefault();
-									mode === "query" ? generateHtml() : submitFeedback();
-								}
-							}}
-						/>
-						<Button
-							disabled={
-								(mode === "query" && (!query.trim() || isGenerating)) ||
-								(mode === "feedback" && isApplying)
-							}
-							className={`bg-groq text-groq-foreground transition-all duration-200 ${
-								isGenerating || isApplying
-									? "loading-animation"
-									: "bg-[#F55036] hover:bg-[#D93D26]"
-							}`}
-							onClick={mode === "query" ? generateHtml : submitFeedback}
-						>
-							{mode === "query"
-								? isGenerating
-									? "Generating..."
-									: "Generate"
-								: isApplying
-									? "Applying..."
-									: "Apply edit"}
-						</Button>
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button variant="outline">
-									<Ellipsis size={16} />
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent>
-								<DropdownMenuItem
-									onClick={() => setIsOverlayOpen(!isOverlayOpen)}
-								>
-									Show prompt
-								</DropdownMenuItem>
-							</DropdownMenuContent>
-						</DropdownMenu>
+						<PromptInput />
+						<OptionsButton className="hidden lg:flex" />
 					</div>
 				</div>
 			</div>
