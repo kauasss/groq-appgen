@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { vscDarkPlus } from "react-syntax-highlighter/dist/cjs/styles/prism";
+import { vscDarkPlus, vs } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import { CopyButton } from "@/components/CopyButton";
 import { ReloadButton } from "@/components/ReloadButton";
 import { ShareButton } from "@/components/ShareButton";
@@ -17,7 +17,7 @@ import { OptionsButton } from "./options-button";
 import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import AppLogo from "@/components/AppLogo";
-
+import { useTheme } from "next-themes";
 
 export default function StudioView() {
 	return (
@@ -45,6 +45,7 @@ function HomeContent() {
 		sessionId,
 		setStudioMode,
 	} = useStudio();
+	const { theme } = useTheme();
 
 	useEffect(() => {
 		const source = searchParams.get("source");
@@ -121,7 +122,7 @@ function HomeContent() {
 					<div className="relative h-full">
 						<SyntaxHighlighter
 							language="html"
-							style={vscDarkPlus}
+							style={theme === 'dark' ? vscDarkPlus : vs}
 							className="h-full rounded"
 							customStyle={{ margin: 0, height: "100%", width: "100%" }}
 						>
