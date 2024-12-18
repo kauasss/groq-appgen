@@ -38,7 +38,7 @@ export default function SharedApp({
 				style={{ height: "100vh" }}
 				scrolling="no"
 			/>
-			<div className="absolute bottom-6 right-6 flex gap-2 z-10">
+			<div className="absolute bottom-4 left-4 flex gap-2 z-10">
 				<RemixButton sessionId={params.sessionId} version={params.version} />
 			</div>
 		</div>
