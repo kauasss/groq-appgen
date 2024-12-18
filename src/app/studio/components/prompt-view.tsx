@@ -38,18 +38,19 @@ export default function PromptView() {
 	return (
 		<div className="flex flex-col gap-6 items-center justify-center h-screen">
 			<div className="flex flex-col gap-3 items-center justify-center min-w-[30%]">
-				<h1 className="text-2xl font-bold">Start a mini-app</h1>
+				<h1 className="text-[3em] font-montserrat mb-10">Start a mini-app</h1>
 				<form
-					className="flex row gap-3 items-center justify-center w-full"
+					className="flex row gap-3 items-center justify-center w-full border-border border-solid border-2 rounded-full p-2 focus-within:border-primary "
 					onSubmit={handleSubmit}
 				>
 					<Input
+						autoFocus
 						value={query}
 						onChange={(e) => setQuery(e.target.value)}
-						className="w-full max-w-md"
+						className="w-full max-w-md border-0 md:text-xl p-3 focus:outline-none focus:border-0 focus:ring-0 focus-visible:ring-0 focus-visible:border-0"
 						placeholder="Describe your app..."
 					/>
-					<Button>Create</Button>
+					<Button className="rounded-full">Create</Button>
 				</form>
 			</div>
 			<div className="flex row flex-wrap gap-3 items-center justify-center w-[30%] ">
