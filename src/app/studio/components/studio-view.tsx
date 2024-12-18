@@ -162,7 +162,7 @@ function HomeContent() {
 						<iframe
 							title="Studio Preview"
 							ref={iframeRef}
-							srcDoc={currentHtml}
+							srcDoc={`<style>body{background-color:${theme === 'dark' ? 'rgb(30 30 30)' : '#ffffff'};margin:0;}</style>${currentHtml}`}
 							className="w-full h-full border rounded bg-background shadow-sm"
 							style={{ minHeight: "100%", minWidth: "100%" }}
 							scrolling="no"
