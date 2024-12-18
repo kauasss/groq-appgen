@@ -1,3 +1,5 @@
+"use client";
+
 import { useStudio } from "@/providers/studio-provider";
 import { useEffect } from "react";
 
