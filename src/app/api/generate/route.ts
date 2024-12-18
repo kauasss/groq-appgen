@@ -34,6 +34,7 @@ async function getDrawingDescription(imageData: string): Promise<string> {
       messages: [
         {
           role: "user",
+          // @ts-ignore - Groq's type definitions don't yet support vision models properly
           content: [
             {
               type: "text",
