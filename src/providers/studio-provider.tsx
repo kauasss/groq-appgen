@@ -30,7 +30,7 @@ const [StudioProvider, useStudio] = providerFactory(() => {
 	const [isGenerating, setIsGenerating] = useState(false);
 	const [isApplying, setIsApplying] = useState(false);
 	const iframeRef = useRef<HTMLIFrameElement>(null);
-	const { theme } = useTheme();
+	const { resolvedTheme } = useTheme();
 
 	const generateHtml = async () => {
 		setIsGenerating(true);
@@ -43,7 +43,7 @@ const [StudioProvider, useStudio] = providerFactory(() => {
 				body: JSON.stringify({
 					query,
 					currentHtml,
-					theme,
+					theme: resolvedTheme,
 				}),
 			});
 
@@ -117,7 +117,7 @@ const [StudioProvider, useStudio] = providerFactory(() => {
 					body: JSON.stringify({
 						currentHtml: history[historyIndex].html,
 						feedback: currentFeedback.trim(),
-						theme,
+						theme: resolvedTheme,
 					}),
 				});
 
@@ -186,7 +186,7 @@ const [StudioProvider, useStudio] = providerFactory(() => {
 			query,
 			currentFeedback,
 			currentHtml,
-			theme,
+			theme: resolvedTheme,
 		});
 	};
 

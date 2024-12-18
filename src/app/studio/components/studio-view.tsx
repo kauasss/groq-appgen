@@ -45,7 +45,7 @@ function HomeContent() {
 		sessionId,
 		setStudioMode,
 	} = useStudio();
-	const { theme } = useTheme();
+	const { resolvedTheme } = useTheme();
 
 	useEffect(() => {
 		const source = searchParams.get("source");
@@ -122,7 +122,7 @@ function HomeContent() {
 					<div className="relative h-full">
 						<SyntaxHighlighter
 							language="html"
-							style={theme === 'dark' ? vscDarkPlus : vs}
+							style={resolvedTheme === 'dark' ? vscDarkPlus : vs}
 							className="h-full rounded"
 							customStyle={{ margin: 0, height: "100%", width: "100%" }}
 						>
