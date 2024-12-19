@@ -162,7 +162,11 @@ const [StudioProvider, useStudio] = providerFactory(() => {
 						`/api/apps/${history[historyIndex].sessionId}/${version}`,
 						{
 							method: "POST",
-							body: data.html,
+							body: JSON.stringify({
+								html: data.html,
+								title: "My App",
+								description: "This is my app lorem ipsum dolor sit amet",
+							}),
 						},
 					);
 				}

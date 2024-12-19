@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { RemixButton } from "@/components/RemixButton";
 import { useTheme } from "next-themes";
+import { Button } from "@/components/ui/button";
 
 export default function SharedApp({
 	params,
@@ -24,7 +25,12 @@ export default function SharedApp({
 					throw new Error("Failed to fetch HTML");
 				}
 				const htmlContent = await response.text();
-				setHtml(htmlContent);
+				if (htmlContent.startsWith("{")) {
+					const data = JSON.parse(htmlContent);
+					setHtml(data.html);
+				} else {
+					setHtml(htmlContent);
+				}
 			} catch (error) {
 				console.error("Error fetching HTML:", error);
 			}
@@ -70,17 +76,9 @@ export default function SharedApp({
 							</div>
 						</div>
 						<div className="mt-2 flex justify-end">
-							<button
-								onClick={handleAccept}
-								disabled={!accepted}
-								className={`px-4 py-2 rounded transition-colors ${
-									accepted
-										? "bg-blue-600 dark:bg-blue-500 text-white hover:bg-blue-700 dark:hover:bg-blue-600"
-										: "bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
-								}`}
-							>
+							<Button onClick={handleAccept} disabled={!accepted}>
 								Continue
-							</button>
+							</Button>
 						</div>
 					</div>
 				</div>
