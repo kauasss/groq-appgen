@@ -89,7 +89,7 @@ export default function PromptView() {
 					onClose={() => setShowDrawing(false)}
 				/>
 			)}
-			<div className="flex row flex-nowrap gap-3 items-center w-[90%] md:w-[60%] lg:w-[30%] overflow-x-auto pb-4 px-2 md:flex-wrap md:overflow-x-visible md:justify-center">
+			<div className="flex  flex-wrap justify-center gap-3 items-center w-[90%] md:w-[60%] lg:w-[30%] pb-4 px-2 ">
 				{APP_SUGGESTIONS.map((suggestion) => (
 					<Button
 						key={suggestion}
