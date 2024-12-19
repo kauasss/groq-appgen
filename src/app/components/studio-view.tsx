@@ -52,7 +52,6 @@ function HomeContent() {
 	useEffect(() => {
 		const source = searchParams.get("source");
 		if (source) {
-			console.log("source", source);
 			const loadSourceVersion = async () => {
 				try {
 					const response = await fetch(`/api/apps/${source}`);
@@ -61,18 +60,22 @@ function HomeContent() {
 					}
 
 					let html = "";
+					let signature = "";
 					const content = await response.text();
 					if (content.startsWith("{")) {
 						const json = JSON.parse(content);
 						html = json.html;
+						signature = json.signature;
 					} else {
 						html = content;
+						throw new Error("This pre-release version is not supported");
 					}
 					const newEntry: HistoryEntry = {
 						html,
 						feedback: "",
 						sessionId,
 						version: "1",
+						signature,
 					};
 					setHistory([newEntry]);
 					setHistoryIndex(0);
