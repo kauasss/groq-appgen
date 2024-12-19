@@ -3,6 +3,29 @@ interface AppExample {
   prompt: string;
 }
 
+export const EASTER_EGG_PROMPT = `A race where 3 logos go from left to right. Each logo is on a separate row, but it's a snug fit. Make sure the logos are not overlapping and the page width is used.
+				
+The logos should have rounded corners. Make them 48px. The text should appear once the Groq logo is at the finish line. 
+
+Only the Groq logo should STOP before the finish line, then we stop updating the position of the other logos.
+
+Use pure JavaScript for the animation.
+
+As a funny joke, put the logos of Cerebras and SambaNova upside down using CSS transforms.
+
+Groq (https://images.crunchbase.com/image/upload/c_pad,h_170,w_170,f_auto,b_white,q_auto:eco,dpr_2/le3jn0kzou7feco18wuo) goes to the finish fastest
+SambaNova (https://images.crunchbase.com/image/upload/c_pad,h_170,w_170,f_auto,b_white,q_auto:eco,dpr_2/y85yyhlbrxjtcow3u9es)
+Cerebras (https://images.crunchbase.com/image/upload/c_pad,h_170,w_170,f_auto,b_white,q_auto:eco,dpr_2/oxlye0pmonwkanrw206j)
+NVIDIA (https://images.crunchbase.com/image/upload/c_pad,h_170,w_170,f_auto,b_white,q_auto:eco,dpr_2/v1502744943/jhowtgkdwv2aa1eodg2b.png)
+AMD (https://images.crunchbase.com/image/upload/c_pad,h_170,w_170,f_auto,b_white,q_auto:eco,dpr_2/mexfxtohyewwqg7iq2wl)
+Intel (https://images.crunchbase.com/image/upload/c_pad,h_170,w_170,f_auto,b_white,q_auto:eco,dpr_2/qpoiezeptj4q8krro55g)
+
+Make sure it is correct JavaScript, you are an expert coder.
+
+Make sure Groq, SambaNova, Cerabras, NVIDIA, AMD, Intel are all represented. Speeds between 0.2 and 1.0.
+
+Then the text appears: Groq wins!`
+
 export const APP_EXAMPLES: AppExample[] = [
   {
     label: "Calculator",

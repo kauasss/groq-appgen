@@ -48,12 +48,12 @@ export default function PromptView() {
 	return (
 		<div className="flex flex-col gap-6 items-center justify-center h-screen relative">
 			<AppLogo className="top-10 absolute" size={120} />
-			<div className="flex flex-col gap-3 items-center justify-center min-w-[30%]">
+			<div className="flex flex-col gap-3 items-center justify-center min-w-[30%] px-4 md:px-0">
 				<div>
-					<h1 className="text-[3em] font-montserrat text-center">
+					<h1 className="text-[2em] md:text-[3em] font-montserrat text-center">
 						Build a micro-app
 					</h1>
-					<h2 className="text-[1.4em] font-montserrat mb-8 text-center text-muted-foreground">
+					<h2 className="text-[1.2em] md:text-[1.4em] font-montserrat mb-4 md:mb-8 text-center text-muted-foreground">
 						in seconds
 					</h2>
 				</div>
@@ -72,7 +72,7 @@ export default function PromptView() {
 						type="button"
 						variant="ghost"
 						size="icon"
-						className="rounded-full relative z-10 shrink-0 hidden md:flex"
+						className="rounded-full relative z-10 shrink-0 flex items-center justify-center"
 						onClick={() => setShowDrawing(true)}
 					>
 						{drawingData ? "Edit Drawing" : <Pencil className="h-5 w-5" />}
@@ -89,12 +89,12 @@ export default function PromptView() {
 					onClose={() => setShowDrawing(false)}
 				/>
 			)}
-			<div className="flex row flex-wrap gap-3 items-center justify-center w-[90%] md:w-[60%] lg:w-[30%]">
+			<div className="flex row flex-nowrap gap-3 items-center w-[90%] md:w-[60%] lg:w-[30%] overflow-x-auto pb-4 px-2 md:flex-wrap md:overflow-x-visible md:justify-center">
 				{APP_SUGGESTIONS.map((suggestion) => (
 					<Button
 						key={suggestion}
 						variant="outline"
-						className="rounded-full text-xs"
+						className="rounded-full text-xs whitespace-nowrap shrink-0"
 						onClick={handleSuggestionClick(suggestion)}
 					>
 						{suggestion}

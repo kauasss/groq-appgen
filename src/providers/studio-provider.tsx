@@ -1,9 +1,10 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import { providerFactory } from "./provider-factory";
 import { v4 as uuidv4 } from "uuid";
 import toast from "react-hot-toast";
 import { constructPrompt } from "@/utils/prompt";
 import { useTheme } from "next-themes";
+import { EASTER_EGG_PROMPT } from "@/data/app-examples";
 
 export interface HistoryEntry {
 	html: string;
@@ -37,13 +38,19 @@ const [StudioProvider, useStudio] = providerFactory(() => {
 	const generateHtml = async () => {
 		setIsGenerating(true);
 		try {
+			let currentQuery = query;
+			if (query.trim().toLowerCase() === "groq race") {
+				currentQuery = EASTER_EGG_PROMPT;
+				setQuery(currentQuery);
+			}
+
 			const response = await fetch("/api/generate", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
-					query,
+					query: currentQuery,
 					currentHtml,
 					theme: resolvedTheme,
 					drawingData,

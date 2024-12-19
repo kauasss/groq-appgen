@@ -29,18 +29,41 @@ export function DrawingCanvas({ onDrawingComplete, onClose }: DrawingCanvasProps
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }, []);
 
-  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     if (!context) return;
     setIsDrawing(true);
-    const { offsetX, offsetY } = e.nativeEvent;
+    
+    let x: number, y: number;
+    if ('touches' in e) {
+      const rect = canvasRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      x = e.touches[0].clientX - rect.left;
+      y = e.touches[0].clientY - rect.top;
+    } else {
+      x = e.nativeEvent.offsetX;
+      y = e.nativeEvent.offsetY;
+    }
+    
     context.beginPath();
-    context.moveTo(offsetX, offsetY);
+    context.moveTo(x, y);
   };
 
-  const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     if (!isDrawing || !context) return;
-    const { offsetX, offsetY } = e.nativeEvent;
-    context.lineTo(offsetX, offsetY);
+    e.preventDefault(); // Prevent scrolling on mobile
+
+    let x: number, y: number;
+    if ('touches' in e) {
+      const rect = canvasRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      x = e.touches[0].clientX - rect.left;
+      y = e.touches[0].clientY - rect.top;
+    } else {
+      x = e.nativeEvent.offsetX;
+      y = e.nativeEvent.offsetY;
+    }
+
+    context.lineTo(x, y);
     context.stroke();
   };
 
@@ -64,28 +87,31 @@ export function DrawingCanvas({ onDrawingComplete, onClose }: DrawingCanvasProps
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-background p-4 rounded-lg">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 touch-none">
+      <div className="bg-background p-4 rounded-lg w-full max-w-[400px]">
         <div className="flex flex-col gap-4">
           <canvas
             ref={canvasRef}
             width={300}
             height={500}
-            className="border border-border rounded-lg cursor-crosshair bg-white"
+            className="border border-border rounded-lg cursor-crosshair bg-white w-full touch-none"
             onMouseDown={startDrawing}
             onMouseMove={draw}
             onMouseUp={stopDrawing}
             onMouseLeave={stopDrawing}
+            onTouchStart={startDrawing}
+            onTouchMove={draw}
+            onTouchEnd={stopDrawing}
           />
-          <div className="flex justify-between">
-            <Button variant="outline" onClick={handleClear}>
+          <div className="flex justify-between gap-2">
+            <Button variant="outline" onClick={handleClear} className="min-w-[60px]">
               Clear
             </Button>
             <div className="flex gap-2">
-              <Button variant="outline" onClick={onClose}>
+              <Button variant="outline" onClick={onClose} className="min-w-[60px]">
                 Cancel
               </Button>
-              <Button onClick={handleComplete}>
+              <Button onClick={handleComplete} className="min-w-[60px]">
                 Done
               </Button>
             </div>
