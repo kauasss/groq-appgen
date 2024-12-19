@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { getFromStorage, saveToStorage } from "@/server/storage";
+import { addToGallery, getFromStorage, saveToStorage } from "@/server/storage";
 import { verifyHtml } from "@/server/signing";
 
 export async function GET(
@@ -40,6 +40,7 @@ export async function POST(
 
 	try {
 		await saveToStorage(key, JSON.stringify({ html, signature, ...rest }));
+		await addToGallery({ sessionId, version, ...rest });
 
 		return new NextResponse(JSON.stringify({ success: true }), {
 			headers: {
