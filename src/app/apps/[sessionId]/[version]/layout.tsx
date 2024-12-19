@@ -27,6 +27,7 @@ export async function generateMetadata({
 				openGraph: {
 					title: data.title,
 					description: data.description,
+					images: `https://image.thum.io/get/https://appgen.groqlabs.com/api/apps/${sessionId}/${version}/raw`,
 					type: "website",
 				},
 			};
