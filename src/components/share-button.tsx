@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { IoShareOutline } from "react-icons/io5";
 import { Tooltip } from "react-tooltip";
 import { Button } from "./ui/button";
@@ -30,6 +30,9 @@ export function ShareButton({
 	const [title, setTitle] = useState("");
 	const [description, setDescription] = useState("");
 
+	// Ref for the input that appears after sharing
+	const sharedInputRef = useRef<HTMLInputElement>(null);
+
 	const handleShare = async () => {
 		setStatus("sharing");
 		const version = crypto.randomUUID();
@@ -47,6 +50,14 @@ export function ShareButton({
 	};
 
 	const shareEnabled = title && description;
+
+	// When status changes to "shared", focus and select the input text.
+	useEffect(() => {
+		if (status === "shared" && sharedInputRef.current) {
+			sharedInputRef.current.focus();
+			sharedInputRef.current.select();
+		}
+	}, [status]);
 
 	useEffect(() => {
 		if (version) {
@@ -80,14 +91,14 @@ export function ShareButton({
 					{status === "shared" && (
 						<div className="flex flex-col justify-center items-center w-full h-[350px]">
 							<h2 className="text-lg font-montserrat">Shared!</h2>
-							<p className="text-sm text-gray-500">
+							<p className="text-sm text-gray-500 p-3">
 								Your app has been shared! You can now share the link with your
 								friends.
 							</p>
 							<div className="flex flex-col gap-2">
 								<div className="text-sm font-medium">Link:</div>
 								<div className="flex gap-2">
-									<Input autoFocus value={url} />
+									<Input autoFocus value={url} ref={sharedInputRef} readOnly />
 									<Button
 										size="icon"
 										onClick={() => copyToClipboard(url)}
@@ -104,7 +115,7 @@ export function ShareButton({
 								>
 									Link copied to clipboard!
 								</div>
-								<div className="flex gap-2">
+								<div className="flex gap-2 justify-end">
 									<Button variant="outline" onClick={() => setOpen(false)}>
 										Close
 									</Button>
