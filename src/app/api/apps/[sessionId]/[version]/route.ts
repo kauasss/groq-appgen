@@ -30,7 +30,7 @@ export async function POST(
 	{ params }: { params: { sessionId: string; version: string } },
 ) {
 	const { sessionId, version } = params;
-	const { html, signature } = await request.json();
+	const { html, signature, ...rest } = await request.json();
 
 	if (!verifyHtml(html, signature)) {
 		return new NextResponse("Invalid signature", { status: 400 });
@@ -39,7 +39,7 @@ export async function POST(
 	const key = `${sessionId}/${version}`;
 
 	try {
-		await saveToStorage(key, html);
+		await saveToStorage(key, JSON.stringify({ html, signature, ...rest }));
 
 		return new NextResponse(JSON.stringify({ success: true }), {
 			headers: {
