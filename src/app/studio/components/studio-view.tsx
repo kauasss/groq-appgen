@@ -157,9 +157,6 @@ function HomeContent() {
 									!history[historyIndex]?.sessionId ||
 									!history[historyIndex]?.version
 								}
-								onShare={async () => {
-									// The HTML is already saved when generated
-								}}
 							/>
 						</div>
 						<iframe
