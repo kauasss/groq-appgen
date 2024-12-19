@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getFromStorage, saveToStorage } from "@/server/storage";
+import { verifyHtml } from "@/server/signing";
 
 export async function GET(
 	request: NextRequest,
@@ -29,7 +30,12 @@ export async function POST(
 	{ params }: { params: { sessionId: string; version: string } },
 ) {
 	const { sessionId, version } = params;
-	const html = await request.text();
+	const { html, signature } = await request.json();
+
+	if (!verifyHtml(html, signature)) {
+		return new NextResponse("Invalid signature", { status: 400 });
+	}
+
 	const key = `${sessionId}/${version}`;
 
 	try {

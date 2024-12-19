@@ -12,6 +12,7 @@ export interface HistoryEntry {
 		total_time: number;
 		total_tokens: number;
 	};
+	signature?: string;
 	sessionId?: string;
 	version?: string;
 }
@@ -71,6 +72,7 @@ const [StudioProvider, useStudio] = providerFactory(() => {
 				const version = (history.length + 1).toString();
 				const newEntry: HistoryEntry = {
 					html: data.html,
+					signature: data.signature,
 					feedback: "",
 					usage: data.usage,
 					sessionId,
@@ -142,6 +144,7 @@ const [StudioProvider, useStudio] = providerFactory(() => {
 						html: data.html,
 						feedback: "",
 						usage: data.usage,
+						signature: data.signature,
 						sessionId: history[historyIndex].sessionId,
 						version,
 					};

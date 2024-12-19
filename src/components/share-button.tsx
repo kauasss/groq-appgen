@@ -14,11 +14,13 @@ interface ShareButtonProps {
 	sessionId?: string;
 	version?: string;
 	disabled?: boolean;
+	signature: string;
 }
 
 export function ShareButton({
 	sessionId,
 	version,
+	signature,
 	disabled,
 }: ShareButtonProps) {
 	const { currentHtml } = useStudio();
@@ -40,6 +42,7 @@ export function ShareButton({
 			method: "POST",
 			body: JSON.stringify({
 				html: currentHtml,
+				signature,
 				title,
 				description,
 			}),

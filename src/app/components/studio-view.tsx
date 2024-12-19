@@ -160,6 +160,7 @@ function HomeContent() {
 							<ShareButton
 								sessionId={history[historyIndex]?.sessionId}
 								version={history[historyIndex]?.version}
+								signature={history[historyIndex]?.signature}
 								disabled={
 									!history[historyIndex]?.sessionId ||
 									!history[historyIndex]?.version
