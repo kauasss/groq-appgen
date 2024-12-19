@@ -4,6 +4,7 @@ import { Toaster } from "react-hot-toast";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ModeToggle } from "@/components/mode-toggle";
+import { StudioProvider } from "@/providers/studio-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 

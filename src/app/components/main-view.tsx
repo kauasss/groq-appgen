@@ -1,11 +1,9 @@
-"use client";
-
-import { useStudio } from "@/providers/studio-provider";
-import PromptView from "./components/prompt-view";
-import StudioView from "./components/studio-view";
 import { useEffect } from "react";
+import PromptView from "./prompt-view";
+import StudioView from "./studio-view";
+import { useStudio } from "@/providers/studio-provider";
 
-export default function Home() {
+export default function MainView() {
 	const { studioMode, setStudioMode } = useStudio();
 
 	useEffect(() => {

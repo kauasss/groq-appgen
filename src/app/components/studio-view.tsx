@@ -60,8 +60,15 @@ function HomeContent() {
 					if (!response.ok) {
 						throw new Error("Failed to load source version");
 					}
-					const html = await response.text();
-					const [sourceSessionId, sourceVersion] = source.split("/");
+
+					let html = "";
+					const content = await response.text();
+					if (content.startsWith("{")) {
+						const json = JSON.parse(content);
+						html = json.html;
+					} else {
+						html = content;
+					}
 					const newEntry: HistoryEntry = {
 						html,
 						feedback: "",

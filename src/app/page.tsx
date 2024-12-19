@@ -1,10 +1,12 @@
-import { redirect } from "next/navigation";
+"use client";
+
+import { StudioProvider } from "@/providers/studio-provider";
+import MainView from "./components/main-view";
 
 export default function Home() {
-	redirect("/studio");
-	return <></>;
+	return (
+		<StudioProvider>
+			<MainView />
+		</StudioProvider>
+	);
 }
-
-export const metadata = {
-	title: "Groq Mini-Apps",
-};
