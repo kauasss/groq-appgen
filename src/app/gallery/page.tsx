@@ -1,12 +1,18 @@
 import { cn, getOgImageUrl } from "@/lib/utils";
 import { getGallery } from "@/server/storage";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 export default async function GalleryPage() {
 	const gallery = await getGallery();
 	return (
 		<main className="p-4">
-			<h1 className="font-montserrat text-[2em] font-light mb-10">Gallery</h1>
+			<div className="flex items-center gap-2 mb-10">
+				<Link href="/" className=" w-10 h-10 flex items-center justify-center ">
+					<ArrowLeft size={20} />
+				</Link>
+				<h1 className="font-montserrat text-[2em] font-light ">Gallery</h1>
+			</div>
 			<div className="flex flex-wrap gap-4 md:gap-6 xl:gap-8 justify-center">
 				{gallery.map((item) => (
 					<Link
