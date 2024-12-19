@@ -127,10 +127,10 @@ export function ShareButton({
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent>
-				<div className="flex flex-col justify-center items-center w-full h-[350px]">
+				<div className="flex flex-col justify-center items-center w-full">
 					{status === "sharing" && <div>Sharing...</div>}
 					{status === "shared" && (
-						<div className="flex flex-col justify-center items-center w-full h-[350px]">
+						<div className="flex flex-col justify-center items-center w-full">
 							<h2 className="text-lg font-montserrat">Shared!</h2>
 							<p className="text-sm text-gray-500 p-3">
 								Your app has been shared! You can now share the link with your
