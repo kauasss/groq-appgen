@@ -10,8 +10,17 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
 	title: "Groq Appgen",
 	description: "Interactive HTML editor with AI generation",
+
 	icons: {
 		icon: "/icons/icon.png",
+	},
+
+	openGraph: {
+		type: "website",
+		url: "https://appgen.groqlabs.com",
+		title: "Groq Appgen",
+		description: "Interactive HTML editor with AI generation",
+		images: "https://appgen.groqlabs.com/og-labs.png",
 	},
 };
 
