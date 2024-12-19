@@ -9,6 +9,7 @@ import { useStudio } from "@/providers/studio-provider";
 import { Check, Copy } from "lucide-react";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { cn } from "@/lib/utils";
+import { toast } from "react-hot-toast";
 
 interface ShareButtonProps {
 	sessionId?: string;
@@ -38,7 +39,7 @@ export function ShareButton({
 	const handleShare = async () => {
 		setStatus("sharing");
 		const version = crypto.randomUUID();
-		await fetch(`/api/apps/${sessionId}/${version}`, {
+		const response = await fetch(`/api/apps/${sessionId}/${version}`, {
 			method: "POST",
 			body: JSON.stringify({
 				html: currentHtml,
@@ -47,6 +48,11 @@ export function ShareButton({
 				description,
 			}),
 		});
+		if (!response.ok) {
+			toast.error("Failed to share app");
+			setStatus("idle");
+			return;
+		}
 		const url = `/apps/${sessionId}/${version}`;
 		setUrl(window.location.origin + url);
 		setStatus("shared");
