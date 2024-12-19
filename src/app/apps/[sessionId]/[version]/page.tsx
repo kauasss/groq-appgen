@@ -94,14 +94,11 @@ export default function SharedApp({
 						scrolling="no"
 					/>
 					<div className="absolute bottom-4 right-4 flex gap-2 z-10">
-						<RemixButton
+						<ReportButton
 							sessionId={params.sessionId}
 							version={params.version}
 						/>
-						
-					</div>
-					<div className="absolute top-4 right-4 flex gap-2 z-10">
-						<ReportButton
+						<RemixButton
 							sessionId={params.sessionId}
 							version={params.version}
 						/>
