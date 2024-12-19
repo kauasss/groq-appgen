@@ -2,6 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { AlertCircle } from "lucide-react";
+import { toast } from "react-hot-toast";
+import { useState } from "react";
 
 interface ReportButtonProps {
   sessionId: string;
@@ -9,6 +11,8 @@ interface ReportButtonProps {
 }
 
 export function ReportButton({ sessionId, version }: ReportButtonProps) {
+  const [isReported, setIsReported] = useState(false);
+
   const reportApp = async () => {
     try {
       const response = await fetch("/api/report", {
@@ -26,10 +30,11 @@ export function ReportButton({ sessionId, version }: ReportButtonProps) {
         throw new Error("Failed to report app");
       }
       
-      alert("App reported successfully");
+      setIsReported(true);
+      toast.success("App reported successfully");
     } catch (error) {
       console.error("Error reporting app:", error);
-      alert("Failed to report app");
+      toast.error("Failed to report app");
     }
   };
 
@@ -38,10 +43,11 @@ export function ReportButton({ sessionId, version }: ReportButtonProps) {
       variant="destructive"
       size="sm"
       onClick={reportApp}
+      disabled={isReported}
       className="flex items-center gap-2"
     >
       <AlertCircle size={16} />
-      Report App
+      {isReported ? "Reported" : "Report App"}
     </Button>
   );
 }
