@@ -8,7 +8,7 @@ import {
 } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import { CopyButton } from "@/components/CopyButton";
 import { ReloadButton } from "@/components/ReloadButton";
-import { ShareButton } from "@/components/ShareButton";
+import { ShareButton } from "@/components/share-button";
 import { ExternalButton } from "@/components/ExternalButton";
 import { type HistoryEntry, useStudio } from "@/providers/studio-provider";
 import { Button } from "@/components/ui/button";
