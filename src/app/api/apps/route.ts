@@ -3,5 +3,12 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
 	const gallery = await getGallery();
-	return NextResponse.json(gallery);
+
+	return new NextResponse(JSON.stringify(gallery), {
+		headers: {
+			"Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+			Pragma: "no-cache",
+			Expires: "0",
+		},
+	});
 }
