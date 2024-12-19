@@ -55,7 +55,7 @@ export function ShareButton({
 			return;
 		}
 		const url = `/apps/${sessionId}/${version}`;
-		setUrl(window.location.origin + url);
+		setUrl(`https://appgen.groqlabs.com${url}`);
 		setStatus("shared");
 	};
 
