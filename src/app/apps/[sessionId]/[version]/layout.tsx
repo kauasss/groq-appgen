@@ -48,5 +48,9 @@ export async function generateMetadata({
 }
 
 export default async function Layout({ children, params }: LayoutProps) {
-	return <>{children}</>;
+	return (
+		<div className="relative">
+			{children}
+		</div>
+	);
 }

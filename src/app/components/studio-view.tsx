@@ -9,7 +9,6 @@ import {
 import { CopyButton } from "@/components/CopyButton";
 import { ReloadButton } from "@/components/ReloadButton";
 import { ShareButton } from "@/components/share-button";
-import { ExternalButton } from "@/components/ExternalButton";
 import { type HistoryEntry, useStudio } from "@/providers/studio-provider";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
@@ -149,14 +148,6 @@ function HomeContent() {
 					<div className="h-full p-4 relative">
 						<div className="absolute top-6 right-6 flex gap-2 z-10">
 							<ReloadButton iframeRef={iframeRef} />
-							<ExternalButton
-								sessionId={history[historyIndex]?.sessionId}
-								version={history[historyIndex]?.version}
-								disabled={
-									!history[historyIndex]?.sessionId ||
-									!history[historyIndex]?.version
-								}
-							/>
 							<ShareButton
 								sessionId={history[historyIndex]?.sessionId}
 								version={history[historyIndex]?.version}

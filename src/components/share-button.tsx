@@ -32,6 +32,7 @@ export function ShareButton({
 
 	const [title, setTitle] = useState("");
 	const [description, setDescription] = useState("");
+	const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
 
 	// Ref for the input that appears after sharing
 	const sharedInputRef = useRef<HTMLInputElement>(null);
@@ -58,6 +59,31 @@ export function ShareButton({
 		setStatus("shared");
 	};
 
+	const fetchSuggestions = async () => {
+		setIsLoadingSuggestions(true);
+		try {
+			const response = await fetch('/api/suggest', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ html: currentHtml }),
+			});
+
+			if (!response.ok) {
+				throw new Error('Failed to fetch suggestions');
+			}
+
+			const suggestions = await response.json();
+			setTitle(suggestions.title || '');
+			setDescription(suggestions.description || '');
+		} catch (error) {
+			console.error('Error fetching suggestions:', error);
+		} finally {
+			setIsLoadingSuggestions(false);
+		}
+	};
+
 	const shareEnabled = title && description;
 
 	// When status changes to "shared", focus and select the input text.
@@ -73,6 +99,12 @@ export function ShareButton({
 			setStatus("idle");
 		}
 	}, [version]);
+
+	useEffect(() => {
+		if (open && status === 'idle' && !title && !description) {
+			fetchSuggestions();
+		}
+	}, [open, status]);
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
@@ -139,7 +171,9 @@ export function ShareButton({
 						<div className="flex flex-col gap-6">
 							<h2 className="text-lg font-montserrat">Share your app</h2>
 							<p className="text-sm text-gray-500">
-								These entries will be shown when you share them around.
+								{isLoadingSuggestions 
+									? "Generating suggestions..."
+									: "These entries will be shown when you share them around."}
 							</p>
 							<div className="flex flex-col gap-2">
 								<div className="text-sm font-medium">App name:</div>
@@ -148,6 +182,7 @@ export function ShareButton({
 										value={title}
 										onChange={(e) => setTitle(e.target.value)}
 										placeholder="e.g. Rainbow Calculator"
+										disabled={isLoadingSuggestions}
 									/>
 								</div>
 							</div>
@@ -160,11 +195,12 @@ export function ShareButton({
 										value={description}
 										onChange={(e) => setDescription(e.target.value)}
 										placeholder="e.g. A calculator that shows the rainbow colors"
+										disabled={isLoadingSuggestions}
 									/>
 								</div>
 							</div>
 							<div className="flex justify-end">
-								<Button onClick={handleShare} disabled={!shareEnabled}>
+								<Button onClick={handleShare} disabled={!shareEnabled || isLoadingSuggestions}>
 									Share
 								</Button>
 							</div>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { RemixButton } from "@/components/RemixButton";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
+import { ReportButton } from "@/app/components/report-button";
 
 export default function SharedApp({
 	params,
@@ -94,6 +95,13 @@ export default function SharedApp({
 					/>
 					<div className="absolute bottom-4 right-4 flex gap-2 z-10">
 						<RemixButton
+							sessionId={params.sessionId}
+							version={params.version}
+						/>
+						
+					</div>
+					<div className="absolute top-4 right-4 flex gap-2 z-10">
+						<ReportButton
 							sessionId={params.sessionId}
 							version={params.version}
 						/>
