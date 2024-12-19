@@ -85,12 +85,6 @@ const [StudioProvider, useStudio] = providerFactory(() => {
 				setCurrentHtml(data.html);
 				setMode("feedback");
 				setDrawingData(null); // Clear drawing data after successful generation
-
-				// Save the HTML to the server
-				await fetch(`/api/apps/${sessionId}/${version}`, {
-					method: "POST",
-					body: data.html,
-				});
 			}
 		} catch (error) {
 			console.error("Error:", error);
@@ -156,19 +150,6 @@ const [StudioProvider, useStudio] = providerFactory(() => {
 					setHistoryIndex(newHistory.length - 1);
 					setCurrentHtml(data.html);
 					setCurrentFeedback("");
-
-					// Save the HTML to the server
-					await fetch(
-						`/api/apps/${history[historyIndex].sessionId}/${version}`,
-						{
-							method: "POST",
-							body: JSON.stringify({
-								html: data.html,
-								title: "My App",
-								description: "This is my app lorem ipsum dolor sit amet",
-							}),
-						},
-					);
 				}
 			}
 		} catch (error) {
