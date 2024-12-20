@@ -27,6 +27,7 @@ export async function getGallery(): Promise<GalleryItem[]> {
 
 export async function addToGallery(item: GalleryItem) {
 	const gallery = await getGallery();
-	gallery.push(item);
+	// add item to the beginning of the array
+	gallery.unshift(item);
 	await saveToStorage("gallery", JSON.stringify(gallery));
 }
