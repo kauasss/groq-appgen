@@ -35,7 +35,7 @@ export default function RootLayout({
 			<body className={inter.className}>
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
 					{children}
-					<ModeToggle />
+					{/* <ModeToggle /> */}
 					<Toaster position="bottom-right" />
 				</ThemeProvider>
 			</body>
