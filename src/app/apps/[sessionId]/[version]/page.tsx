@@ -89,8 +89,6 @@ export default function SharedApp({
 							sessionId={params.sessionId}
 							version={params.version}
 						/>
-					</div>
-					<div className="absolute bottom-4 left-4 z-10">
 						<UpvoteButton
 							sessionId={params.sessionId}
 							version={params.version}

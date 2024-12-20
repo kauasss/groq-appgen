@@ -4,17 +4,19 @@ import crypto from "crypto";
 interface GalleryItem {
 	sessionId: string;
 	version: string;
-	html: string;
-	signature: string;
 	title: string;
 	description: string;
 	upvotes?: string[]; // Array of IP addresses that have upvoted
 	createdAt: string; // ISO date string
-	creatorIP: string; // IP address of the creator
 }
 
 function hashIP(ip: string): string {
 	return crypto.createHash('sha256').update(ip).digest('hex').substring(0, 8);
+}
+
+export async function isIPBlocked(ip: string): Promise<boolean> {
+	const blockedIPs = await getBlockedIPs();
+	return blockedIPs.includes(ip);
 }
 
 export function getStorageKey(sessionId: string, version: string, ip?: string): string {
@@ -41,13 +43,14 @@ export async function getFromStorage(key: string) {
 	return value;
 }
 
-export async function getFromStorageWithRegex(key: string) {
+export async function getFromStorageWithRegex(key: string): Promise<{value: string, key: string}> {
 	const redis = new Redis(process.env.UPSTASH_REDIS_URL);
 	const keys = await redis.keys(key);
 	if(keys.length === 0) {
 		throw new Error("Not found");
 	}
-	return getFromStorage(keys[0]);
+	
+	return {value: await getFromStorage(keys[0]), key: keys[0]};
 }
 
 export async function getGalleryKeys(): Promise<string[]> {
@@ -88,36 +91,52 @@ export async function blockIP(ip: string, token: string) {
 	}
 }
 
-export async function isIPBlocked(ip: string): Promise<boolean> {
-	const blockedIPs = await getBlockedIPs();
-	return blockedIPs.includes(ip);
-}
+// Cache for gallery items
+let galleryCache: {
+	items: GalleryItem[];
+	lastFetch: number;
+} | null = null;
 
 export async function getGallery(): Promise<GalleryItem[]> {
-	const keys = await getGalleryKeys();
-	const redis = new Redis(process.env.UPSTASH_REDIS_URL);
-	const items: GalleryItem[] = [];
+	const now = Date.now();
+	const CACHE_TTL = 30 * 1000; // 30 seconds in milliseconds
 
-	for (const key of keys) {
-		const itemStr = await redis.get(key);
-		if (itemStr) {
+	// Return cached data if it's still fresh
+	if (galleryCache && (now - galleryCache.lastFetch) < CACHE_TTL) {
+		return galleryCache.items;
+	}
+
+	const keys = await getGalleryKeys();
+	if(keys.length === 0) {
+		return [];
+	}
+
+	const redis = new Redis(process.env.UPSTASH_REDIS_URL);
+	const itemStrings = await redis.mget(...keys);
+	
+	const items = itemStrings
+		.filter((str): str is string => str !== null)
+		.map((str) => {
 			try {
-				items.push(JSON.parse(itemStr));
+				return JSON.parse(str) as GalleryItem;
 			} catch (err) {
 				console.error("Error parsing gallery item:", err);
+				return null;
 			}
-		}
-	}
+		})
+		.filter((item): item is GalleryItem => item !== null);
+
+	// Update cache
+	galleryCache = {
+		items,
+		lastFetch: now
+	};
 
 	return items;
 }
 
-export async function addToGallery(item: GalleryItem): Promise<boolean> {
-	if (await isIPBlocked(item.creatorIP)) {
-		console.warn(`Someone tried to submit from a blocked IP: ${item.creatorIP}`);
-		return false;
-	}
-
+export async function addToGallery(item: GalleryItem, creatorIP: string): Promise<boolean> {
+	
 	// Initialize upvotes array and ensure createdAt is set
 	item.upvotes = [];
 	item.createdAt = item.createdAt || new Date().toISOString();
@@ -125,7 +144,7 @@ export async function addToGallery(item: GalleryItem): Promise<boolean> {
 	// Generate unique key with timestamp and random hash
 	const timestamp = Math.floor(Date.now() / 1000);
 	const randomHash = Math.random().toString(36).substring(2, 8);
-	const key = getGalleryKey(timestamp, randomHash, item.creatorIP);
+	const key = getGalleryKey(timestamp, randomHash, creatorIP);
 	
 	await saveToStorage(key, JSON.stringify(item));
 
@@ -138,13 +157,18 @@ export async function removeGalleryItem(sessionId: string, version: string, requ
 	
 	// Look for items with matching sessionId/version and IP hash
 	const keys = await redis.keys(`gallery_*_${ipHash}`);
-	for (const key of keys) {
-		const itemStr = await redis.get(key);
+	if(keys.length === 0) {
+		throw new Error("Unauthorized: You can only remove your own submissions");
+	}
+	
+	const itemStrings = await redis.mget(...keys);
+	for (let i = 0; i < keys.length; i++) {
+		const itemStr = itemStrings[i];
 		if (itemStr) {
 			try {
 				const item = JSON.parse(itemStr);
 				if (item.sessionId === sessionId && item.version === version) {
-					await redis.del(key);
+					await redis.del(keys[i]);
 					return true;
 				}
 			} catch (err) {
@@ -156,56 +180,47 @@ export async function removeGalleryItem(sessionId: string, version: string, requ
 	throw new Error("Unauthorized: You can only remove your own submissions");
 }
 
-export async function upvoteGalleryItem(sessionId: string, version: string, ip: string): Promise<number> {
-	const keys = await getGalleryKeys();
-	const redis = new Redis(process.env.UPSTASH_REDIS_URL);
-	
-	for (const key of keys) {
-		const itemStr = await redis.get(key);
-		if (itemStr) {
-			try {
-				const item = JSON.parse(itemStr);
-				if (item.sessionId === sessionId && item.version === version) {
-					// Initialize upvotes array if it doesn't exist
-					if (!item.upvotes) {
-						item.upvotes = [];
-					}
+export async function upvoteGalleryItem(sessionId: string, version: string, voterIp: string): Promise<number> {
+	const {value: itemStr} = await getFromStorageWithRegex(getStorageKey(sessionId, version));
+	if (!itemStr) throw new Error("App not found");
 
-					// Check if user already voted
-					if (item.upvotes.includes(ip)) {
-						throw new Error("Already voted");
-					}
+	const item = JSON.parse(itemStr);
+	const creatorIpHash = hashIP(item.creatorIP);
 
-					// Add upvote
-					item.upvotes.push(ip);
-					await saveToStorage(key, JSON.stringify(item));
+	let { value:galleryItemString, key: galleryItemKey} = await getFromStorageWithRegex("gallery_*_" + creatorIpHash);
 
-					return item.upvotes.length;
-				}
-			} catch (err) {
-				console.error("Error parsing gallery item:", err);
-			}
-		}
+	let galleryItem = JSON.parse(galleryItemString);
+
+	// Initialize upvotes array if it doesn't exist
+	if (!galleryItem.upvotes) {
+		galleryItem.upvotes = [];
 	}
-	throw new Error("Gallery item not found");
+
+	// Check if user already voted
+	if (galleryItem.upvotes.includes(voterIp)) {
+		throw new Error("Already voted");
+	}
+
+	// Add upvote
+	galleryItem.upvotes.push(voterIp);
+	await saveToStorage(galleryItemKey, JSON.stringify(item));
+
+	return galleryItem.upvotes.length;
 }
 
 export async function getUpvotes(sessionId: string, version: string): Promise<number> {
-	const keys = await getGalleryKeys();
-	const redis = new Redis(process.env.UPSTASH_REDIS_URL);
-	
-	for (const key of keys) {
-		const itemStr = await redis.get(key);
-		if (itemStr) {
-			try {
-				const item = JSON.parse(itemStr);
-				if (item.sessionId === sessionId && item.version === version) {
-					return item.upvotes?.length || 0;
-				}
-			} catch (err) {
-				console.error("Error parsing gallery item:", err);
-			}
-		}
+	const {value: itemStr} = await getFromStorageWithRegex(getStorageKey(sessionId, version));
+	if (!itemStr) throw new Error("App not found");
+
+	const item = JSON.parse(itemStr);
+	const creatorIpHash = hashIP(item.creatorIP);
+
+	let {value: galleryItemString} = await getFromStorageWithRegex("gallery_*_" + creatorIpHash)
+	let galleryItem = JSON.parse(galleryItemString);
+
+	if (!galleryItem.upvotes) {
+		galleryItem.upvotes = [];
 	}
-	throw new Error("Gallery item not found");
+
+	return galleryItem.upvotes.length;
 }

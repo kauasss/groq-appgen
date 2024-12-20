@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getFromStorageWithRegex, saveToStorage, getStorageKey, addToGallery } from "@/server/storage";
+import { getFromStorageWithRegex, saveToStorage, getStorageKey, addToGallery, isIPBlocked } from "@/server/storage";
 import { verifyHtml } from "@/server/signing";
 
 export async function GET(
@@ -11,7 +11,7 @@ export async function GET(
 
 	try {
 		const key = getStorageKey(sessionId, version);
-		const value = await getFromStorageWithRegex(key);
+		const { value } = await getFromStorageWithRegex(key);
 
 		if (!value) {
 			return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -44,6 +44,15 @@ export async function POST(
 	try {
 		const { html, signature, avoidGallery, ...rest } = await request.json();
 		const ip = request.headers.get("x-forwarded-for") || request.ip || "unknown";
+
+		if (await isIPBlocked(ip)) {
+			console.warn(`Someone tried to submit from a blocked IP: ${ip}`);
+			return NextResponse.json(
+				{ error: "IP address is blocked" },
+				{ status: 403 }
+			);
+		}
+
 		const key = getStorageKey(sessionId, version, ip);
 
 		if (!verifyHtml(html, signature)) {
@@ -69,11 +78,9 @@ export async function POST(
 			let success = await addToGallery({ 
 				sessionId, 
 				version, 
-				html,
 				signature,
 				...rest,
-				creatorIP: ip 
-			});
+			}, ip);
 			if(!success) {
 				return NextResponse.json(
 					{ error: "Failed to save app" },

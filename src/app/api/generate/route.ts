@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import Groq from "groq-sdk";
 import { constructPrompt } from "@/utils/prompt";
 import { signHtml } from "@/server/signing";
+import { PRIMARY_MODEL, PRIMARY_VISION_MODEL, FALLBACK_VISION_MODEL, getFallbackModel } from '@/utils/model-selection';
 
 const client = new Groq({
 	apiKey: process.env.GROQ_API_KEY,
@@ -27,42 +28,78 @@ async function checkContentSafety(
 		};
 	} catch (error) {
 		console.error("Error checking content safety:", error);
-		throw error;
+		return { safe: true, category: undefined };
 	}
+}
+
+async function tryVisionCompletion(imageData: string, model: string) {
+	return await client.chat.completions.create({
+		messages: [
+			{
+				role: "user",
+				content: [
+					{
+						type: "text",
+						text: "Describe this UI drawing in detail",
+					},
+					{
+						type: "image_url",
+						image_url: {
+							url: imageData,
+						},
+					},
+				],
+			},
+		],
+		model: model,
+		temperature: 0.7,
+		max_tokens: 1024,
+		top_p: 1,
+		stream: false,
+		stop: null,
+	});
+}
+
+async function tryCompletion(prompt: string, model: string) {
+  return await client.chat.completions.create({
+    messages: [{ role: "user", content: prompt }],
+    model: model,
+    temperature: 0.1,
+    max_tokens: 2000,
+    top_p: 1,
+    stream: false,
+    stop: null,
+  });
+}
+
+async function generateWithFallback(prompt: string) {
+  try {
+    const chatCompletion = await tryCompletion(prompt, PRIMARY_MODEL);
+    return chatCompletion;
+  } catch (error) {
+    console.error('Primary model failed, trying fallback model:', error);
+    try {
+      const chatCompletion = await tryCompletion(prompt, getFallbackModel());
+      return chatCompletion;
+    } catch (error) {
+      console.error("Error generating completion:", error);
+      throw error;
+    }
+  }
 }
 
 async function getDrawingDescription(imageData: string): Promise<string> {
 	try {
-		const chatCompletion = await client.chat.completions.create({
-			messages: [
-				{
-					role: "user",
-					content: [
-						{
-							type: "text",
-							text: "Describe this UI drawing in detail",
-						},
-						{
-							type: "image_url",
-							image_url: {
-								url: imageData,
-							},
-						},
-					],
-				},
-			],
-			model: "llama-3.2-90b-vision-preview",
-			temperature: 0.7,
-			max_tokens: 1024,
-			top_p: 1,
-			stream: false,
-			stop: null,
-		});
-
+		const chatCompletion = await tryVisionCompletion(imageData, PRIMARY_VISION_MODEL);
 		return chatCompletion.choices[0].message.content;
 	} catch (error) {
-		console.error("Error processing drawing:", error);
-		throw error;
+		try {
+			const chatCompletion = await tryVisionCompletion(imageData, FALLBACK_VISION_MODEL);
+			return chatCompletion.choices[0].message.content;
+		} catch (error) {
+			console.error("Error processing drawing:", error);
+			throw error;
+		}
 	}
 }
 
@@ -87,12 +124,7 @@ export async function POST(request: Request) {
 		// Run safety check and code completion in parallel
 		const [safetyResult, chatCompletion] = await Promise.all([
 			checkContentSafety(prompt),
-			client.chat.completions.create({
-				messages: [{ role: "user", content: prompt }],
-				model: "llama-3.3-70b-specdec",
-				temperature: 0.1,
-				max_tokens: 2000,
-			}),
+			generateWithFallback(prompt),
 		]);
 
 		// Check safety result before proceeding

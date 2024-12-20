@@ -216,7 +216,7 @@ function HomeContent() {
 									className="underline"
 									href="https://console.groq.com/docs/models"
 								>
-									llama-3.3-70b-specdec
+									Try Groq now!
 								</a>
 							</span>
 						)}

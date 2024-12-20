@@ -5,7 +5,6 @@ import { getOgImageUrl } from "@/lib/utils";
 import { ThumbsUp, Clock } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { Spinner } from "@/components/ui/spinner";
-import { mutate } from "swr";
 
 interface GalleryItemWithUpvotes {
 	sessionId: string;
@@ -14,7 +13,6 @@ interface GalleryItemWithUpvotes {
 	description: string;
 	upvoteCount: number;
 	createdAt: string;
-	creatorIP: string;
 }
 
 interface GalleryListingProps {
@@ -24,13 +22,17 @@ interface GalleryListingProps {
 
 export function GalleryListing({ limit, view = "popular" }: GalleryListingProps) {
 	const { data: gallery, isLoading } = useSWR<GalleryItemWithUpvotes[]>(
-		`/api/apps?view=${view}`,
+		view ? `/api/apps?view=${view}` : null,
 		async (url) => {
 			const response = await fetch(url);
 			if (!response.ok) {
 				throw new Error("Failed to fetch gallery");
 			}
 			return response.json();
+		},
+		{
+			revalidateOnFocus: false,
+			dedupingInterval: 30000, // Match the server-side cache of 30 seconds
 		}
 	);
 

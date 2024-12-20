@@ -19,7 +19,7 @@ export async function generateMetadata({
 	try {
 		const headersList = headers();
 		const key = getStorageKey(sessionId, version);
-		const res = await getFromStorageWithRegex(key);
+		const { value:res } = await getFromStorageWithRegex(key);
 		
 		if (!res) {
 			return {};

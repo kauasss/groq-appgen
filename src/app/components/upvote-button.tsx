@@ -42,15 +42,15 @@ export function UpvoteButton({
   };
 
   return (
-    <Button
-      variant="secondary"
-      size="sm"
-      onClick={handleUpvote}
-      disabled={isLoading}
-      className="flex items-center gap-2"
-    >
-      <ThumbsUp size={16} />
-      <span>{upvotes}</span>
-    </Button>
+    <>
+      <Button
+        variant="outline"
+        className="flex gap-2 px-3"
+        onClick={handleUpvote}
+        disabled={isLoading}
+      >
+        <ThumbsUp /> {upvotes}
+      </Button>
+    </>
   );
 }

@@ -1,10 +1,33 @@
 import { NextResponse } from 'next/server';
 
 import Groq from 'groq-sdk';
+import { PRIMARY_MODEL, getFallbackModel } from '@/utils/model-selection';
 
 const client = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
+
+async function generateSuggestionWithFallback(messages: any[]) {
+  try {
+    return await client.chat.completions.create({
+      messages,
+      model: PRIMARY_MODEL,
+      temperature: 0.7,
+      max_tokens: 200,
+      top_p: 1,
+    });
+  } catch (error) {
+    // If the primary model fails, try with a fallback model
+    console.error('Primary model failed, trying fallback model');
+    return await client.chat.completions.create({
+      messages,
+      model: getFallbackModel(),
+      temperature: 0.7,
+      max_tokens: 200,
+      top_p: 1,
+    });
+  }
+}
 
 export async function POST(request: Request) {
   try {
@@ -17,25 +40,18 @@ export async function POST(request: Request) {
       );
     }
 
-    const chatCompletion = await client.chat.completions.create({
-      messages: [
-        {
-          role: 'user',
-          content: `Given this HTML content, suggest a concise title and brief description that captures the essence of the app. The title should be descriptive, while the description should explain what the app does in a single sentence. Format the response as JSON with "title" and "description" fields.
+    const completion = await generateSuggestionWithFallback([
+      {
+        role: 'user',
+        content: `Given this HTML content, suggest a concise title and brief description that captures the essence of the app. The title should be descriptive, while the description should explain what the app does in a single sentence. Format the response as JSON with "title" and "description" fields.
 
 <app html>
 ${html}
 </app html>`,
-        },
-      ],
-      model: 'llama-3.3-70b-specdec',
-      temperature: 0.7,
-      max_tokens: 200,
-      top_p: 1,
-      stream: false,
-    });
+      },
+    ]);
 
-    const responseContent = chatCompletion.choices[0]?.message?.content || '';
+    const responseContent = completion.choices[0]?.message?.content || '';
     const startIndex = responseContent.indexOf('{');
     const endIndex = responseContent.lastIndexOf('}');
     

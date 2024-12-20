@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     try {
         // Get the app data to find the creator's IP
         const key = getStorageKey(sessionId, version);
-        const appDataStr = await getFromStorageWithRegex(key);
+        const { value: appDataStr } = await getFromStorageWithRegex(key);
         
         if (!appDataStr) {
             return NextResponse.json(

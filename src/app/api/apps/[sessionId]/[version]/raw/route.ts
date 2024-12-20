@@ -9,7 +9,7 @@ export async function GET(
 
 	try {
 		const key = getStorageKey(sessionId, version);
-		const value = await getFromStorageWithRegex(key);
+		const {value} = await getFromStorageWithRegex(key);
 
 		if (!value) {
 			return NextResponse.json({ error: "Not found" }, { status: 404 });
