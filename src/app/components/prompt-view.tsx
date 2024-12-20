@@ -8,6 +8,7 @@ import { useState } from "react";
 import { APP_EXAMPLES } from "@/data/app-examples";
 import { Pencil } from "lucide-react";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 import { GalleryListing } from "./gallery-listing";
 
@@ -26,6 +27,10 @@ export default function PromptView() {
 
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
+		if (!query.trim() && !drawingData) {
+			toast.error("Describe your app or draw it!");
+			return;
+		}
 		setStudioMode(true);
 		setTriggerGeneration(true);
 	};
@@ -56,8 +61,8 @@ export default function PromptView() {
 					<h1 className="text-[2em] md:text-[3em] font-montserrat text-center">
 						Build a micro-app
 					</h1>
-					<h2 className="text-[1.2em] md:text-[1.4em] font-montserrat mb-4 md:mb-8 text-center text-muted-foreground">
-						in seconds
+					<h2 className="text-[1.2em] md:text-[1.4em] font-montserrat mb-4 md:mb-8 text-center text-muted-foreground italic">
+						at Groq speed
 					</h2>
 				</div>
 				<form
@@ -92,7 +97,7 @@ export default function PromptView() {
 					onClose={() => setShowDrawing(false)}
 				/>
 			)}
-			<div className="flex  flex-wrap justify-center gap-3 items-center w-[90%] md:w-[60%] lg:w-[30%] pb-4 px-2 ">
+			<div className="flex  flex-wrap justify-center gap-3 items-center w-[90%] md:w-[60%] lg:w-[50%] pb-4 px-2 ">
 				{APP_SUGGESTIONS.map((suggestion) => (
 					<Button
 						key={suggestion}
@@ -106,7 +111,7 @@ export default function PromptView() {
 			</div>
 			<div className="w-full px-4 mb-[100px]">
 				<Link href="/gallery">
-					<h2 className="font-montserrat text-xl mt-20 mb-10 text-center">
+					<h2 className="font-montserrat text-2xl mt-20 mb-10 text-center">
 						Gallery
 					</h2>
 				</Link>
