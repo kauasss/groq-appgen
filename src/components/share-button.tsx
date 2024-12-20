@@ -10,6 +10,7 @@ import { Check, Copy } from "lucide-react";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { cn } from "@/lib/utils";
 import { toast } from "react-hot-toast";
+import { Checkbox } from "./ui/checkbox";
 
 interface ShareButtonProps {
 	sessionId?: string;
@@ -29,6 +30,7 @@ export function ShareButton({
 	const [status, setStatus] = useState<"idle" | "sharing" | "shared">("idle");
 	const [open, setOpen] = useState(false);
 	const [url, setUrl] = useState("");
+	const [avoidGallery, setAvoidGallery] = useState(false);
 
 	const [title, setTitle] = useState("");
 	const [description, setDescription] = useState("");
@@ -47,6 +49,7 @@ export function ShareButton({
 				signature,
 				title,
 				description,
+				avoidGallery,
 			}),
 		});
 		if (!response.ok) {
@@ -62,23 +65,23 @@ export function ShareButton({
 	const fetchSuggestions = async () => {
 		setIsLoadingSuggestions(true);
 		try {
-			const response = await fetch('/api/suggest', {
-				method: 'POST',
+			const response = await fetch("/api/suggest", {
+				method: "POST",
 				headers: {
-					'Content-Type': 'application/json',
+					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({ html: currentHtml }),
 			});
 
 			if (!response.ok) {
-				throw new Error('Failed to fetch suggestions');
+				throw new Error("Failed to fetch suggestions");
 			}
 
 			const suggestions = await response.json();
-			setTitle(suggestions.title || '');
-			setDescription(suggestions.description || '');
+			setTitle(suggestions.title || "");
+			setDescription(suggestions.description || "");
 		} catch (error) {
-			console.error('Error fetching suggestions:', error);
+			console.error("Error fetching suggestions:", error);
 		} finally {
 			setIsLoadingSuggestions(false);
 		}
@@ -101,7 +104,7 @@ export function ShareButton({
 	}, [version]);
 
 	useEffect(() => {
-		if (open && status === 'idle' && !title && !description) {
+		if (open && status === "idle" && !title && !description) {
 			fetchSuggestions();
 		}
 	}, [open, status]);
@@ -171,7 +174,7 @@ export function ShareButton({
 						<div className="flex flex-col gap-6">
 							<h2 className="text-lg font-montserrat">Share your app</h2>
 							<p className="text-sm text-gray-500">
-								{isLoadingSuggestions 
+								{isLoadingSuggestions
 									? "Generating suggestions..."
 									: "These entries will be shown when you share them around."}
 							</p>
@@ -199,8 +202,24 @@ export function ShareButton({
 									/>
 								</div>
 							</div>
+							<div className="flex items-center space-x-2">
+								<Checkbox
+									id="dontgallery"
+									checked={avoidGallery}
+									onCheckedChange={(checked) => setAvoidGallery(!!checked)}
+								/>
+								<label
+									htmlFor="dontgallery"
+									className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+								>
+									Don't show in gallery
+								</label>
+							</div>
 							<div className="flex justify-end">
-								<Button onClick={handleShare} disabled={!shareEnabled || isLoadingSuggestions}>
+								<Button
+									onClick={handleShare}
+									disabled={!shareEnabled || isLoadingSuggestions}
+								>
 									Share
 								</Button>
 							</div>
