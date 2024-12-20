@@ -61,7 +61,7 @@ export default function PromptView() {
 					<h1 className="text-[2em] md:text-[3em] font-montserrat text-center">
 						Build a micro-app
 					</h1>
-					<h2 className="text-[1.2em] md:text-[1.4em] font-montserrat mb-4 md:mb-8 text-center text-muted-foreground italic">
+					<h2 className="text-[1.2em] md:text-[1.4em] font-montserrat mb-4 md:mb-8 text-center text-muted-foreground ">
 						at Groq speed
 					</h2>
 				</div>
