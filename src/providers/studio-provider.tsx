@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import toast from "react-hot-toast";
 import { constructPrompt } from "@/utils/prompt";
 import { useTheme } from "next-themes";
-import { EASTER_EGG_PROMPT } from "@/data/app-examples";
+import { EASTER_EGGS } from "@/data/easter-eggs";
 
 export interface HistoryEntry {
 	html: string;
@@ -41,11 +41,13 @@ const [StudioProvider, useStudio] = providerFactory(() => {
 		setIsGenerating(true);
 		try {
 			let currentQuery = query;
-			if (query.trim().toLowerCase() === "groq race") {
-				currentQuery = EASTER_EGG_PROMPT;
+			const easterEgg = EASTER_EGGS.find(
+				(egg) => egg.trigger.toLowerCase() === query.trim().toLowerCase()
+			);
+			if (easterEgg) {
+				currentQuery = easterEgg.prompt;
 				setQuery(currentQuery);
 			}
-
 
 			const response = await fetch("/api/generate", {
 				method: "POST",
