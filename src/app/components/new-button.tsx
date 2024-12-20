@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useStudio } from "@/providers/studio-provider";
 import { Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from "uuid";
 
 export function NewButton({ className }: { className?: string }) {
@@ -15,6 +16,7 @@ export function NewButton({ className }: { className?: string }) {
 		setMode,
 		setCurrentFeedback,
 	} = useStudio();
+	const router = useRouter();
 	return (
 		<Button
 			className={cn("flex items-center gap-2", className)}
@@ -27,6 +29,7 @@ export function NewButton({ className }: { className?: string }) {
 				setSessionId(uuidv4());
 				setMode("query");
 				setCurrentFeedback("");
+				router.push("/");
 			}}
 		>
 			<Plus size={16} />
