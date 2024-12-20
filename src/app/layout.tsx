@@ -3,8 +3,7 @@ import { Inter } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import { ModeToggle } from "@/components/mode-toggle";
-import { StudioProvider } from "@/providers/studio-provider";
+import { ROOT_URL } from "@/utils/config";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,10 +17,10 @@ export const metadata: Metadata = {
 
 	openGraph: {
 		type: "website",
-		url: "https://appgen.groqlabs.com",
+		url: ROOT_URL,
 		title: "Groq Appgen",
 		description: "Interactive HTML editor with AI generation",
-		images: "https://appgen.groqlabs.com/og-labs.png",
+		images: `${ROOT_URL}/og-labs.png`,
 	},
 };
 

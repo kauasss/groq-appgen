@@ -80,10 +80,19 @@ export default function PromptView() {
 						type="button"
 						variant="ghost"
 						size="icon"
-						className="rounded-full relative z-10 shrink-0 flex items-center justify-center"
+						className={`rounded-full relative z-10 shrink-0 flex items-center justify-center px-3 ${
+							drawingData ? "min-w-[80px]" : "min-w-[40px]"
+						}`}
 						onClick={() => setShowDrawing(true)}
 					>
-						{drawingData ? "Edit Drawing" : <Pencil className="h-5 w-5" />}
+						{drawingData ? (
+							<div className="flex items-center gap-1.5">
+								<Pencil className="h-4 w-4" />
+								<span className="text-sm">Edit</span>
+							</div>
+						) : (
+							<Pencil className="h-5 w-5" />
+						)}
 					</Button>
 					<MicrophoneButton onTranscription={handleTranscription} />
 					<Button className="rounded-full" type="submit">

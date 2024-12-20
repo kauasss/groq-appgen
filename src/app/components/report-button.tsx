@@ -21,20 +21,23 @@ export function ReportButton({ sessionId, version }: ReportButtonProps) {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
-					app_url: `${window.location.origin}/apps/${sessionId}/${version}`,
-					ban_url: "<placeholder>",
+					sessionId,
+					appUrl: `${window.location.origin}/apps/${sessionId}/${version}`,
+					rootUrl: window.location.origin,
+					version,
 				}),
 			});
 
 			if (!response.ok) {
-				throw new Error("Failed to report app");
+				const error = await response.json();
+				throw new Error(error.error || "Failed to report app");
 			}
 
 			setIsReported(true);
 			toast.success("App reported successfully");
 		} catch (error) {
 			console.error("Error reporting app:", error);
-			toast.error("Failed to report app");
+			toast.error(error instanceof Error ? error.message : "Failed to report app");
 		}
 	};
 
@@ -46,7 +49,7 @@ export function ReportButton({ sessionId, version }: ReportButtonProps) {
 			className="flex items-center gap-2"
 		>
 			<AlertCircle size={16} />
-			{isReported ? "Reported" : "Report "}
+			{isReported ? "Reported" : "Report"}
 		</Button>
 	);
 }

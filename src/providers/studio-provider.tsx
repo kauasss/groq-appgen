@@ -46,7 +46,6 @@ const [StudioProvider, useStudio] = providerFactory(() => {
 				setQuery(currentQuery);
 			}
 
-			const startTime = Date.now();
 
 			const response = await fetch("/api/generate", {
 				method: "POST",
@@ -57,6 +56,7 @@ const [StudioProvider, useStudio] = providerFactory(() => {
 					...{
 						query: currentQuery,
 						currentHtml,
+						drawingData,
 						theme: resolvedTheme
 					},
 					sessionId,
@@ -92,7 +92,7 @@ const [StudioProvider, useStudio] = providerFactory(() => {
 		} finally {
 			setIsGenerating(false);
 		}
-	}, [query, currentHtml, resolvedTheme, sessionId, history, setHistory, setHistoryIndex, setCurrentHtml, setMode, setQuery]);
+	}, [query, currentHtml, resolvedTheme, sessionId, history, setHistory, setHistoryIndex, setCurrentHtml, setMode, setQuery, drawingData]);
 
 	const submitFeedback = async () => {
 		setIsApplying(true);

@@ -37,11 +37,21 @@ export function DrawingCanvas({ onDrawingComplete, onClose }: DrawingCanvasProps
     if ('touches' in e) {
       const rect = canvasRef.current?.getBoundingClientRect();
       if (!rect) return;
-      x = e.touches[0].clientX - rect.left;
-      y = e.touches[0].clientY - rect.top;
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      // For touch events, calculate the scale and apply it
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      x = (e.touches[0].clientX - rect.left) * scaleX;
+      y = (e.touches[0].clientY - rect.top) * scaleY;
     } else {
-      x = e.nativeEvent.offsetX;
-      y = e.nativeEvent.offsetY;
+      // For mouse events, use the offsetX/Y directly
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      x = e.nativeEvent.offsetX * scaleX;
+      y = e.nativeEvent.offsetY * scaleX;
     }
     
     context.beginPath();
@@ -56,11 +66,21 @@ export function DrawingCanvas({ onDrawingComplete, onClose }: DrawingCanvasProps
     if ('touches' in e) {
       const rect = canvasRef.current?.getBoundingClientRect();
       if (!rect) return;
-      x = e.touches[0].clientX - rect.left;
-      y = e.touches[0].clientY - rect.top;
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      // For touch events, calculate the scale and apply it
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      x = (e.touches[0].clientX - rect.left) * scaleX;
+      y = (e.touches[0].clientY - rect.top) * scaleY;
     } else {
-      x = e.nativeEvent.offsetX;
-      y = e.nativeEvent.offsetY;
+      // For mouse events, use the offsetX/Y directly
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      x = e.nativeEvent.offsetX * scaleX;
+      y = e.nativeEvent.offsetY * scaleX;
     }
 
     context.lineTo(x, y);

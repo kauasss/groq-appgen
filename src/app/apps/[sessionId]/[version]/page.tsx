@@ -6,6 +6,7 @@ import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { ReportButton } from "@/app/components/report-button";
 import { UpvoteButton } from "@/app/components/upvote-button";
+import { RemoveButton } from "@/app/components/remove-button"; // Added import statement
 
 export default function SharedApp({
 	params,
@@ -95,6 +96,10 @@ export default function SharedApp({
 					/>
 					<div className="absolute bottom-4 right-4 flex gap-2 z-10">
 						<ReportButton
+							sessionId={params.sessionId}
+							version={params.version}
+						/>
+						<RemoveButton
 							sessionId={params.sessionId}
 							version={params.version}
 						/>

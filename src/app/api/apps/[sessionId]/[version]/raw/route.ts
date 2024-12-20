@@ -1,33 +1,32 @@
-import { getFromStorage } from "@/server/storage";
-import { type NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { getFromStorage, getStorageKey } from "@/server/storage";
 
 export async function GET(
 	request: NextRequest,
-	{ params }: { params: { sessionId: string; version: string } },
+	{ params }: { params: { sessionId: string; version: string } }
 ) {
 	const { sessionId, version } = params;
 
 	try {
-		const content = await getFromStorage(`${sessionId}/${version}`);
-		let html = "";
+		const ip = request.headers.get("x-forwarded-for") || request.ip || "unknown";
+		const key = getStorageKey(sessionId, version, ip);
+		const value = await getFromStorage(key);
 
-		if (content.startsWith("{")) {
-			const json = JSON.parse(content);
-			html = json.html;
-		} else {
-			html = content;
+		if (!value) {
+			return NextResponse.json({ error: "Not found" }, { status: 404 });
 		}
 
-		if (!html) {
-			return new NextResponse("Not found", { status: 404 });
-		}
-
-		return new NextResponse(html, {
+		const data = JSON.parse(value);
+		return new NextResponse(data.html, {
 			headers: {
 				"Content-Type": "text/html",
 			},
 		});
 	} catch (error) {
-		return new NextResponse("Internal Server Error", { status: 500 });
+		console.error("Error retrieving raw app:", error);
+		return NextResponse.json(
+			{ error: "Failed to retrieve app" },
+			{ status: 500 }
+		);
 	}
 }

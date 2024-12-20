@@ -1,6 +1,8 @@
-import { getFromStorage } from "@/server/storage";
+import { getFromStorage, getStorageKey } from "@/server/storage";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { ROOT_URL } from "@/utils/config";
+import { headers } from "next/headers";
 
 interface LayoutProps {
 	children: React.ReactNode;
@@ -13,44 +15,38 @@ interface LayoutProps {
 export async function generateMetadata({
 	params,
 }: LayoutProps): Promise<Metadata> {
-	console.log(JSON.stringify(params));
 	const { sessionId, version } = params;
 
 	try {
-		const res = await getFromStorage(`${sessionId}/${version}`);
+		const headersList = headers();
+		const ip = headersList.get("x-forwarded-for")?.split(",")[0] || "unknown";
+		const key = getStorageKey(sessionId, version, ip);
+		const res = await getFromStorage(key);
+		
+		if (!res) {
+			return {};
+		}
 
-		if (res.startsWith("{")) {
-			const data = JSON.parse(res);
+		const data = JSON.parse(res);
+		if (data) {
 			return {
 				title: data.title,
 				description: data.description,
 				openGraph: {
 					title: data.title,
 					description: data.description,
-					images: `https://image.thum.io/get/https://appgen.groqlabs.com/api/apps/${sessionId}/${version}/raw`,
+					images: `https://image.thum.io/get/${ROOT_URL}/api/apps/${sessionId}/${version}/raw`,
 					type: "website",
 				},
 			};
 		}
-		return {
-			title: "Groq Micro-App (No metadata)",
-			description: "This app was created in Groq Micro-Apps",
-			openGraph: {
-				title: "Groq Micro-App (No metadata)",
-				description: "This app was created in Groq Micro-Apps",
-				type: "website",
-			},
-		};
 	} catch (error) {
 		console.error("Error generating metadata:", error);
-		notFound(); // Handle navigation to a 404 page if the fetch fails or data is invalid
 	}
+
+	return {};
 }
 
-export default async function Layout({ children, params }: LayoutProps) {
-	return (
-		<div className="relative">
-			{children}
-		</div>
-	);
+export default function Layout({ children, params }: LayoutProps) {
+	return <>{children}</>;
 }

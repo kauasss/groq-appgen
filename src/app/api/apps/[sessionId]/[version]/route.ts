@@ -1,5 +1,5 @@
-import { type NextRequest, NextResponse } from "next/server";
-import { addToGallery, getFromStorage, saveToStorage } from "@/server/storage";
+import { NextRequest, NextResponse } from "next/server";
+import { getFromStorage, saveToStorage, getStorageKey, addToGallery } from "@/server/storage";
 import { verifyHtml } from "@/server/signing";
 
 export async function GET(
@@ -7,21 +7,32 @@ export async function GET(
 	{ params }: { params: { sessionId: string; version: string } },
 ) {
 	const { sessionId, version } = params;
+	const raw = request.nextUrl.searchParams.get("raw") === "true";
 
 	try {
-		const html = await getFromStorage(`${sessionId}/${version}`);
+		const ip = request.headers.get("x-forwarded-for") || request.ip || "unknown";
+		const key = getStorageKey(sessionId, version, ip);
+		const value = await getFromStorage(key);
 
-		if (!html) {
-			return new NextResponse("Not found", { status: 404 });
+		if (!value) {
+			return NextResponse.json({ error: "Not found" }, { status: 404 });
 		}
 
-		return new NextResponse(html, {
-			headers: {
-				"Content-Type": "text/html",
-			},
-		});
+		const data = JSON.parse(value);
+		if (raw) {
+			return new NextResponse(data.html, {
+				headers: {
+					"Content-Type": "text/html",
+				},
+			});
+		}
+		return NextResponse.json(data);
 	} catch (error) {
-		return new NextResponse("Internal Server Error", { status: 500 });
+		console.error("Error retrieving app:", error);
+		return NextResponse.json(
+			{ error: "Failed to retrieve app" },
+			{ status: 500 }
+		);
 	}
 }
 
@@ -30,33 +41,54 @@ export async function POST(
 	{ params }: { params: { sessionId: string; version: string } },
 ) {
 	const { sessionId, version } = params;
-	const { html, signature, avoidGallery, ...rest } = await request.json();
-
-	if (!verifyHtml(html, signature)) {
-		return new NextResponse("Invalid signature", { status: 400 });
-	}
-
-	const key = `${sessionId}/${version}`;
 
 	try {
-		await saveToStorage(
-			key,
-			JSON.stringify({ html, signature, ...rest, avoidGallery }),
-		);
+		const { html, signature, avoidGallery, ...rest } = await request.json();
+		const ip = request.headers.get("x-forwarded-for") || request.ip || "unknown";
+		const key = getStorageKey(sessionId, version, ip);
 
-		if (!avoidGallery) {
-			await addToGallery({ sessionId, version, ...rest });
+		if (!verifyHtml(html, signature)) {
+			return NextResponse.json(
+				{ error: "Invalid signature" },
+				{ status: 400 }
+			);
 		}
 
-		return new NextResponse(JSON.stringify({ success: true }), {
-			headers: {
-				"Content-Type": "application/json",
-			},
-		});
+		// Add creatorIP to the stored data
+		const data = {
+			html,
+			signature,
+			...rest,
+			avoidGallery,
+			creatorIP: ip,
+			createdAt: new Date().toISOString(),
+		};
+
+		await saveToStorage(key, JSON.stringify(data));
+
+		if (!avoidGallery) {
+			let success = await addToGallery({ 
+				sessionId, 
+				version, 
+				html,
+				signature,
+				...rest,
+				creatorIP: ip 
+			});
+			if(!success) {
+				return NextResponse.json(
+					{ error: "Failed to save app" },
+					{ status: 500 }
+				);
+			}
+		}
+
+		return NextResponse.json({ success: true });
 	} catch (error) {
-		return new NextResponse(JSON.stringify({ error: "Failed to save HTML" }), {
-			status: 500,
-			headers: { "Content-Type": "application/json" },
-		});
+		console.error("Error saving app:", error);
+		return NextResponse.json(
+			{ error: "Failed to save app" },
+			{ status: 500 }
+		);
 	}
 }
