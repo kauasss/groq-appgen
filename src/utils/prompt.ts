@@ -8,12 +8,17 @@ interface PromptData {
 export function constructPrompt(data: PromptData): string {
   const { query = '', currentHtml = '', currentFeedback = '', theme = '' } = data;
   const hasFeedback = currentFeedback.length > 0;
+
+  const themeInstructions = query.length > 0 ? `The app should follow the user's ${theme} theme preference. ${theme === 'dark' ? 'Use darker background colors and lighter text colors.' : theme === 'light' ? 'Use lighter background colors and darker text colors.' : 'Use a neutral color scheme that works well in both light and dark modes.'} Make sure the colors have good contrast and are accessible.` : '';
+
   const finalPrompt = `${currentHtml ? `<current html>${currentHtml}</current html>` : ''}
 ${currentFeedback ? `<feedback>${currentFeedback}</feedback>` : ''}
 ${!hasFeedback && query ? `<query>Generate a single HTML file based on this query: "${query}"</query>` : ''}
 ${`<output instructions>
 The output should be valid HTML and should be creative and well-structured. Use Tailwind CSS, load it in the <head> tag with <script src="https://cdn.tailwindcss.com"></script>.
-The app should follow the user's ${theme} theme preference. ${theme === 'dark' ? 'Use darker background colors and lighter text colors.' : theme === 'light' ? 'Use lighter background colors and darker text colors.' : 'Use a neutral color scheme that works well in both light and dark modes.'} Make sure the colors have good contrast and are accessible.
+
+${themeInstructions}
+
 Return the HTML content wrapped in triple backticks with 'html' language specifier, like this:
 \`\`\`html
 <your html code here>
@@ -21,6 +26,5 @@ Return the HTML content wrapped in triple backticks with 'html' language specifi
 </output instructions>`}
 `.trim();
 
-  console.log(finalPrompt);
   return finalPrompt;
 }
