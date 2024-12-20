@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getFromStorage, getStorageKey } from "@/server/storage";
+import { getFromStorageWithRegex, getStorageKey } from "@/server/storage";
 import { ROOT_URL } from "@/utils/config";
 
 export async function POST(request: NextRequest) {
     const { sessionId, version, rootUrl = ROOT_URL, appUrl } = await request.json();
     try {
         // Get the app data to find the creator's IP
-        const ip = request.headers.get("x-forwarded-for") || request.ip || "unknown";
-        const key = getStorageKey(sessionId, version, ip);
-        const appDataStr = await getFromStorage(key);
+        const key = getStorageKey(sessionId, version);
+        const appDataStr = await getFromStorageWithRegex(key);
         
         if (!appDataStr) {
             return NextResponse.json(

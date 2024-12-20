@@ -17,7 +17,10 @@ function hashIP(ip: string): string {
 	return crypto.createHash('sha256').update(ip).digest('hex').substring(0, 8);
 }
 
-export function getStorageKey(sessionId: string, version: string, ip: string): string {
+export function getStorageKey(sessionId: string, version: string, ip?: string): string {
+	if (!ip) {
+		return `${sessionId}/${version}/*`;
+	}
 	const ipHash = hashIP(ip);
 	return `${sessionId}/${version}/${ipHash}`;
 }
@@ -36,6 +39,15 @@ export async function getFromStorage(key: string) {
 	const redis = new Redis(process.env.UPSTASH_REDIS_URL);
 	const value = await redis.get(key);
 	return value;
+}
+
+export async function getFromStorageWithRegex(key: string) {
+	const redis = new Redis(process.env.UPSTASH_REDIS_URL);
+	const keys = await redis.keys(key);
+	if(keys.length === 0) {
+		throw new Error("Not found");
+	}
+	return getFromStorage(keys[0]);
 }
 
 export async function getGalleryKeys(): Promise<string[]> {

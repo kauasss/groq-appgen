@@ -1,6 +1,5 @@
-import { getFromStorage, getStorageKey } from "@/server/storage";
+import { getFromStorageWithRegex, getStorageKey } from "@/server/storage";
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { ROOT_URL } from "@/utils/config";
 import { headers } from "next/headers";
 
@@ -19,9 +18,8 @@ export async function generateMetadata({
 
 	try {
 		const headersList = headers();
-		const ip = headersList.get("x-forwarded-for")?.split(",")[0] || "unknown";
-		const key = getStorageKey(sessionId, version, ip);
-		const res = await getFromStorage(key);
+		const key = getStorageKey(sessionId, version);
+		const res = await getFromStorageWithRegex(key);
 		
 		if (!res) {
 			return {};

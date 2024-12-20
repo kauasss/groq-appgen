@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getFromStorage, getStorageKey } from "@/server/storage";
+import { getFromStorageWithRegex, getStorageKey } from "@/server/storage";
 
 export async function GET(
 	request: NextRequest,
@@ -8,9 +8,8 @@ export async function GET(
 	const { sessionId, version } = params;
 
 	try {
-		const ip = request.headers.get("x-forwarded-for") || request.ip || "unknown";
-		const key = getStorageKey(sessionId, version, ip);
-		const value = await getFromStorage(key);
+		const key = getStorageKey(sessionId, version);
+		const value = await getFromStorageWithRegex(key);
 
 		if (!value) {
 			return NextResponse.json({ error: "Not found" }, { status: 404 });

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getFromStorage, saveToStorage, getStorageKey, addToGallery } from "@/server/storage";
+import { getFromStorageWithRegex, saveToStorage, getStorageKey, addToGallery } from "@/server/storage";
 import { verifyHtml } from "@/server/signing";
 
 export async function GET(
@@ -10,9 +10,8 @@ export async function GET(
 	const raw = request.nextUrl.searchParams.get("raw") === "true";
 
 	try {
-		const ip = request.headers.get("x-forwarded-for") || request.ip || "unknown";
-		const key = getStorageKey(sessionId, version, ip);
-		const value = await getFromStorage(key);
+		const key = getStorageKey(sessionId, version);
+		const value = await getFromStorageWithRegex(key);
 
 		if (!value) {
 			return NextResponse.json({ error: "Not found" }, { status: 404 });
