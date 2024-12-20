@@ -49,9 +49,9 @@ export default function PromptView() {
 	};
 
 	return (
-		<div className="flex flex-col gap-6 items-center justify-center h-screen relative">
-			<AppLogo className="top-10 absolute" size={120} />
-			<div className="flex flex-col gap-3 items-center justify-center min-w-[30%] px-4 md:px-0">
+		<div className="flex flex-col gap-6 items-center justify-center  ">
+			<AppLogo className="mt-10 " size={120} />
+			<div className="flex flex-col gap-3 items-center justify-center min-w-[30%] px-4 md:px-0 mt-20">
 				<div>
 					<h1 className="text-[2em] md:text-[3em] font-montserrat text-center">
 						Build a micro-app
@@ -104,11 +104,21 @@ export default function PromptView() {
 					</Button>
 				))}
 			</div>
-			<div>
+			<div className="p-4 mb-[100px]">
 				<Link href="/gallery">
-					<h2 className="font-montserrat text-xl mt-20 mb-10">Gallery</h2>
+					<h2 className="font-montserrat text-xl mt-20 mb-10 text-center">
+						Gallery
+					</h2>
 				</Link>
 				<GalleryListing limit={10} />
+				<div className="w-full flex justify-center mt-10">
+					<Link
+						href="/gallery"
+						className="w-full text-sm text-muted-foreground text-center"
+					>
+						View all
+					</Link>
+				</div>
 			</div>
 		</div>
 	);
