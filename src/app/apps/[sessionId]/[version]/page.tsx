@@ -5,6 +5,7 @@ import { RemixButton } from "@/components/RemixButton";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { ReportButton } from "@/app/components/report-button";
+import { UpvoteButton } from "@/app/components/upvote-button";
 
 export default function SharedApp({
 	params,
@@ -99,6 +100,12 @@ export default function SharedApp({
 							version={params.version}
 						/>
 						<RemixButton
+							sessionId={params.sessionId}
+							version={params.version}
+						/>
+					</div>
+					<div className="absolute bottom-4 left-4 z-10">
+						<UpvoteButton
 							sessionId={params.sessionId}
 							version={params.version}
 						/>

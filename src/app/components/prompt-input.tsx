@@ -13,6 +13,9 @@ export function PromptInput() {
 		setCurrentFeedback,
 		generateHtml,
 		submitFeedback,
+		feedbackHistory,
+		feedbackHistoryIndex,
+		setFeedbackHistoryIndex,
 	} = useStudio();
 
 	const shouldTriggerRef = useRef(false);
@@ -56,6 +59,22 @@ export function PromptInput() {
 					if (e.key === "Enter" && !e.shiftKey) {
 						e.preventDefault();
 						mode === "query" ? generateHtml() : submitFeedback();
+					} else if (mode === "feedback") {
+						if (e.key === "ArrowUp") {
+							e.preventDefault();
+							const newIndex = feedbackHistoryIndex + 1;
+							if (newIndex < feedbackHistory.length) {
+								setFeedbackHistoryIndex(newIndex);
+								setCurrentFeedback(feedbackHistory[newIndex]);
+							}
+						} else if (e.key === "ArrowDown") {
+							e.preventDefault();
+							const newIndex = feedbackHistoryIndex - 1;
+							if (newIndex >= -1) {
+								setFeedbackHistoryIndex(newIndex);
+								setCurrentFeedback(newIndex === -1 ? "" : feedbackHistory[newIndex]);
+							}
+						}
 					}
 				}}
 			/>

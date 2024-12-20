@@ -89,7 +89,7 @@ function HomeContent() {
 			};
 			loadSourceVersion();
 		}
-	}, [searchParams]);
+	}, [searchParams, sessionId, setCurrentHtml, setHistory, setHistoryIndex, setMode, setStudioMode]);
 
 	return (
 		<main className="h-screen flex flex-col overflow-hidden">

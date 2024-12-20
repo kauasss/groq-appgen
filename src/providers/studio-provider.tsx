@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { providerFactory } from "./provider-factory";
 import { v4 as uuidv4 } from "uuid";
 import toast from "react-hot-toast";
@@ -34,8 +34,10 @@ const [StudioProvider, useStudio] = providerFactory(() => {
 	const [drawingData, setDrawingData] = useState<string | null>(null);
 	const iframeRef = useRef<HTMLIFrameElement>(null);
 	const { resolvedTheme } = useTheme();
+	const [feedbackHistory, setFeedbackHistory] = useState<string[]>([]);
+	const [feedbackHistoryIndex, setFeedbackHistoryIndex] = useState(-1);
 
-	const generateHtml = async () => {
+	const generateHtml = useCallback(async () => {
 		setIsGenerating(true);
 		try {
 			let currentQuery = query;
@@ -44,69 +46,71 @@ const [StudioProvider, useStudio] = providerFactory(() => {
 				setQuery(currentQuery);
 			}
 
+			const prompt = constructPrompt({
+				query: currentQuery,
+				currentHtml,
+				theme: resolvedTheme
+			});
+			const startTime = Date.now();
+
 			const response = await fetch("/api/generate", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
-					query: currentQuery,
-					currentHtml,
-					theme: resolvedTheme,
-					drawingData,
+					prompt,
+					sessionId,
+					version: history.length > 0 ? String(history.length + 1) : "1",
 				}),
 			});
 
-			const data = await response.json();
-
 			if (!response.ok) {
-				if (response.status === 400 && data.category) {
-					toast.error(
-						<div>
-							<p>{data.error}</p>
-							<p className="text-sm text-gray-500 mt-1">
-								Category: {data.category}
-							</p>
-						</div>,
-						{ duration: 5000 },
-					);
-					return;
-				}
 				throw new Error("Failed to generate HTML");
 			}
 
-			if (data.html) {
-				const version = (history.length + 1).toString();
-				const newEntry: HistoryEntry = {
-					html: data.html,
-					signature: data.signature,
-					feedback: "",
-					usage: data.usage,
-					sessionId,
-					version,
-				};
-				const newHistory =
-					historyIndex === -1
-						? [newEntry]
-						: [...history.slice(0, historyIndex + 1), newEntry];
-				setHistory(newHistory);
-				setHistoryIndex(newHistory.length - 1);
-				setCurrentHtml(data.html);
-				setMode("feedback");
-				setDrawingData(null); // Clear drawing data after successful generation
-			}
+			const result = await response.json();
+			const endTime = Date.now();
+			const totalTime = endTime - startTime;
+
+			const newEntry: HistoryEntry = {
+				html: result.html,
+				feedback: "",
+				usage: {
+					total_time: totalTime,
+					total_tokens: result.usage?.total_tokens || 0
+				},
+				sessionId,
+				version: String(history.length + 1),
+				signature: result.signature,
+			};
+
+			setHistory((prev) => [...prev, newEntry]);
+			setHistoryIndex((prev) => prev + 1);
+			setCurrentHtml(result.html);
+			setMode("feedback");
 		} catch (error) {
-			console.error("Error:", error);
+			console.error("Error generating HTML:", error);
 			toast.error("Failed to generate HTML");
 		} finally {
 			setIsGenerating(false);
 		}
-	};
+	}, [query, currentHtml, resolvedTheme, sessionId, history, setHistory, setHistoryIndex, setCurrentHtml, setMode, setQuery]);
 
 	const submitFeedback = async () => {
 		setIsApplying(true);
 		try {
 			if (currentFeedback.trim()) {
+				// Add to feedback history, deduplicating entries
+				setFeedbackHistory(prev => {
+					const trimmedFeedback = currentFeedback.trim();
+					// Remove any existing instances of this feedback
+					const dedupedHistory = prev.filter(f => f !== trimmedFeedback);
+					// Add the new feedback at the start
+					return [trimmedFeedback, ...dedupedHistory];
+				});
+				setFeedbackHistoryIndex(-1);
+
 				// Update history entry with new feedback
 				const updatedHistory = [...history];
 				updatedHistory[historyIndex] = {
@@ -204,7 +208,7 @@ const [StudioProvider, useStudio] = providerFactory(() => {
 			setTriggerGeneration(false);
 			generateHtml();
 		}
-	}, [triggerGeneration, setTriggerGeneration]);
+	}, [triggerGeneration, setTriggerGeneration, generateHtml]);
 
 	return {
 		query,
@@ -238,6 +242,10 @@ const [StudioProvider, useStudio] = providerFactory(() => {
 		setSessionId,
 		drawingData,
 		setDrawingData,
+		feedbackHistory,
+		setFeedbackHistory,
+		feedbackHistoryIndex,
+		setFeedbackHistoryIndex,
 	};
 });
 

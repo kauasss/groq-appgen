@@ -62,7 +62,7 @@ export function ShareButton({
 		setStatus("shared");
 	};
 
-	const fetchSuggestions = async () => {
+	const fetchSuggestions = useCallback(async () => {
 		setIsLoadingSuggestions(true);
 		try {
 			const response = await fetch("/api/suggest", {
@@ -85,7 +85,7 @@ export function ShareButton({
 		} finally {
 			setIsLoadingSuggestions(false);
 		}
-	};
+	}, [currentHtml]);
 
 	const shareEnabled = title && description;
 
@@ -107,7 +107,7 @@ export function ShareButton({
 		if (open && status === "idle" && !title && !description) {
 			fetchSuggestions();
 		}
-	}, [open, status]);
+	}, [open, status, title, description, fetchSuggestions]);
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
@@ -119,11 +119,7 @@ export function ShareButton({
 					data-tooltip-content={
 						status === "sharing"
 							? "Sharing..."
-							: status === "shared"
-								? "URL copied!"
-								: disabled
-									? "Sharing not available yet"
-									: "Share this page"
+							: "Share your app&apos;s code"
 					}
 				>
 					<IoShareOutline size={20} /> Share
@@ -212,7 +208,7 @@ export function ShareButton({
 									htmlFor="dontgallery"
 									className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
 								>
-									Don't show in gallery
+									Don&apos;t show in gallery
 								</label>
 							</div>
 							<div className="flex justify-end">
