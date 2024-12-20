@@ -166,8 +166,7 @@ function HomeContent() {
 							ref={iframeRef}
 							srcDoc={`<style>body{background-color:${resolvedTheme === "dark" ? "rgb(30 30 30)" : "#ffffff"};margin:0;}</style>${currentHtml}`}
 							className="w-full h-full border rounded bg-background shadow-sm"
-							style={{ minHeight: "100%", minWidth: "100%" }}
-							scrolling="no"
+							style={{ minHeight: "100%", minWidth: "100%", overflow: "auto" }}
 						/>
 					</div>
 				</div>
@@ -194,23 +193,21 @@ function HomeContent() {
 					</div>
 				</div>
 			</div>
-			<div className="flex w-full max-w-3xl mx-auto">
-				{/* Left column */}
-				<div className="w-1/2 pr-4 pb-4 border-r">
-					<div className="flex items-center justify-end text-sm text-gray-600">
-						<span>Powered by</span>
-						<AppLogo className="scale-75" size={100} />
-					</div>
+			<div className="flex flex-col md:flex-row w-full max-w-3xl mx-auto px-4 md:px-0">
+				{/* Logo section */}
+				<div className="md:w-1/2 md:pr-4 md:border-r flex items-center justify-center md:justify-end py-2">
+					<span className="hidden md:inline text-sm text-muted-foreground">Powered by</span>
+					<AppLogo className="scale-75" size={100} />
 				</div>
-				{/* Right column */}
-				<div className="w-1/2 pl-4 pb-4">
-					<div className="flex items-center justify-start text-sm text-gray-600">
+				{/* Stats section */}
+				<div className="md:w-1/2 md:pl-4 flex items-center justify-center md:justify-start py-2">
+					<div className="text-sm text-muted-foreground text-center md:text-left">
 						{history[historyIndex]?.usage && (
 							<span>
 								{(history[historyIndex].usage.total_time * 1000).toFixed(0)}ms •{" "}
 								{Math.round(
 									history[historyIndex].usage.total_tokens /
-										history[historyIndex].usage.total_time,
+										history[historyIndex].usage.total_time
 								)}{" "}
 								tokens/sec •{" "}
 								<a

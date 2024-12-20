@@ -104,13 +104,15 @@ export default function PromptView() {
 					</Button>
 				))}
 			</div>
-			<div className="p-4 mb-[100px]">
+			<div className="w-full px-4 mb-[100px]">
 				<Link href="/gallery">
 					<h2 className="font-montserrat text-xl mt-20 mb-10 text-center">
 						Gallery
 					</h2>
 				</Link>
-				<GalleryListing limit={10} />
+				<div className="max-w-[1200px] mx-auto">
+					<GalleryListing limit={10} />
+				</div>
 				<div className="w-full flex justify-center mt-10">
 					<Link
 						href="/gallery"

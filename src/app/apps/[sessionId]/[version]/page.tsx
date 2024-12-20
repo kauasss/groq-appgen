@@ -92,7 +92,6 @@ export default function SharedApp({
 						srcDoc={html}
 						className="w-full h-full border-0"
 						style={{ height: "100vh" }}
-						scrolling="no"
 					/>
 					<div className="absolute bottom-4 right-4 flex gap-2 z-10">
 						<ReportButton

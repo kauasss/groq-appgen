@@ -46,11 +46,6 @@ const [StudioProvider, useStudio] = providerFactory(() => {
 				setQuery(currentQuery);
 			}
 
-			const prompt = constructPrompt({
-				query: currentQuery,
-				currentHtml,
-				theme: resolvedTheme
-			});
 			const startTime = Date.now();
 
 			const response = await fetch("/api/generate", {
@@ -59,7 +54,11 @@ const [StudioProvider, useStudio] = providerFactory(() => {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
-					prompt,
+					...{
+						query: currentQuery,
+						currentHtml,
+						theme: resolvedTheme
+					},
 					sessionId,
 					version: history.length > 0 ? String(history.length + 1) : "1",
 				}),
@@ -70,14 +69,12 @@ const [StudioProvider, useStudio] = providerFactory(() => {
 			}
 
 			const result = await response.json();
-			const endTime = Date.now();
-			const totalTime = endTime - startTime;
 
 			const newEntry: HistoryEntry = {
 				html: result.html,
 				feedback: "",
 				usage: {
-					total_time: totalTime,
+					total_time: result.usage?.total_time || 0,
 					total_tokens: result.usage?.total_tokens || 0
 				},
 				sessionId,

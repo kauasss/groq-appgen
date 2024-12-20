@@ -6,10 +6,9 @@ interface PromptData {
 }
 
 export function constructPrompt(data: PromptData): string {
-  const { query = '', currentHtml = '', currentFeedback = '', theme = 'system' } = data;
+  const { query = '', currentHtml = '', currentFeedback = '', theme = '' } = data;
   const hasFeedback = currentFeedback.length > 0;
-  
-  return `${currentHtml ? `<current html>${currentHtml}</current html>` : ''}
+  const finalPrompt = `${currentHtml ? `<current html>${currentHtml}</current html>` : ''}
 ${currentFeedback ? `<feedback>${currentFeedback}</feedback>` : ''}
 ${!hasFeedback && query ? `<query>Generate a single HTML file based on this query: "${query}"</query>` : ''}
 ${`<output instructions>
@@ -21,4 +20,7 @@ Return the HTML content wrapped in triple backticks with 'html' language specifi
 \`\`\`
 </output instructions>`}
 `.trim();
+
+  console.log(finalPrompt);
+  return finalPrompt;
 }
