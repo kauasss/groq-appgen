@@ -7,6 +7,9 @@ import { DrawingCanvas } from "@/components/DrawingCanvas";
 import { useState } from "react";
 import { APP_EXAMPLES } from "@/data/app-examples";
 import { Pencil } from "lucide-react";
+import Link from "next/link";
+
+import { GalleryListing } from "./gallery-listing";
 
 const APP_SUGGESTIONS = APP_EXAMPLES.map((example) => example.label);
 
@@ -100,6 +103,12 @@ export default function PromptView() {
 						{suggestion}
 					</Button>
 				))}
+			</div>
+			<div>
+				<Link href="/gallery">
+					<h2 className="font-montserrat text-xl mt-20 mb-10">Gallery</h2>
+				</Link>
+				<GalleryListing limit={10} />
 			</div>
 		</div>
 	);
