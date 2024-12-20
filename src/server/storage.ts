@@ -203,7 +203,7 @@ export async function upvoteGalleryItem(sessionId: string, version: string, vote
 
 	// Add upvote
 	galleryItem.upvotes.push(voterIp);
-	await saveToStorage(galleryItemKey, JSON.stringify(item));
+	await saveToStorage(galleryItemKey, JSON.stringify(galleryItem));
 
 	return galleryItem.upvotes.length;
 }
