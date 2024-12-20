@@ -1,10 +1,14 @@
+"use client";
+
 import { cn, getOgImageUrl } from "@/lib/utils";
-import { getGallery } from "@/server/storage";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import useSWR from "swr";
 
-export default async function GalleryPage() {
-	const gallery = await getGallery();
+export default function GalleryPage() {
+	const { data: gallery } = useSWR("/api/apps", async () =>
+		fetch("/api/apps").then((res) => res.json()),
+	);
 	return (
 		<main className="p-4">
 			<div className="flex items-center gap-2 mb-10">
@@ -14,7 +18,7 @@ export default async function GalleryPage() {
 				<h1 className="font-montserrat text-[2em] font-light ">Gallery</h1>
 			</div>
 			<div className="flex flex-wrap gap-4 md:gap-6 xl:gap-8 justify-center">
-				{gallery.map((item) => (
+				{gallery?.map((item) => (
 					<Link
 						href={`/apps/${item.sessionId}/${item.version}`}
 						key={item.sessionId}
