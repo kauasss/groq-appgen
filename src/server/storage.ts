@@ -181,27 +181,36 @@ export async function removeGalleryItem(sessionId: string, version: string, requ
 }
 
 export async function upvoteGalleryItem(sessionId: string, version: string, voterIp: string): Promise<number> {
-	const {value: itemStr} = await getFromStorageWithRegex(getStorageKey(sessionId, version));
+	const { value: itemStr } = await getFromStorageWithRegex(getStorageKey(sessionId, version));
 	if (!itemStr) throw new Error("App not found");
 
 	const item = JSON.parse(itemStr);
 	const creatorIpHash = hashIP(item.creatorIP);
 
-	let { value:galleryItemString, key: galleryItemKey} = await getFromStorageWithRegex("gallery_*_" + creatorIpHash);
+	const redis = new Redis(process.env.UPSTASH_REDIS_URL);
+	const keys = await redis.keys("gallery_*_" + creatorIpHash);
+	const galleryItems = await redis.mget(...keys);
 
-	let galleryItem = JSON.parse(galleryItemString);
+	let galleryItem, galleryItemKey;
+	for (let i = 0; i < galleryItems.length; i++) {
+		const parsedItem = JSON.parse(galleryItems[i]);
+		if (parsedItem.sessionId === sessionId && parsedItem.version === version) {
+			galleryItem = parsedItem;
+			galleryItemKey = keys[i];
+			break;
+		}
+	}
 
-	// Initialize upvotes array if it doesn't exist
+	if (!galleryItem) throw new Error("Gallery item not found");
+
 	if (!galleryItem.upvotes) {
 		galleryItem.upvotes = [];
 	}
 
-	// Check if user already voted
 	if (galleryItem.upvotes.includes(voterIp)) {
 		throw new Error("Already voted");
 	}
 
-	// Add upvote
 	galleryItem.upvotes.push(voterIp);
 	await saveToStorage(galleryItemKey, JSON.stringify(galleryItem));
 
@@ -209,18 +218,26 @@ export async function upvoteGalleryItem(sessionId: string, version: string, vote
 }
 
 export async function getUpvotes(sessionId: string, version: string): Promise<number> {
-	const {value: itemStr} = await getFromStorageWithRegex(getStorageKey(sessionId, version));
+	const { value: itemStr } = await getFromStorageWithRegex(getStorageKey(sessionId, version));
 	if (!itemStr) throw new Error("App not found");
 
 	const item = JSON.parse(itemStr);
 	const creatorIpHash = hashIP(item.creatorIP);
 
-	let {value: galleryItemString} = await getFromStorageWithRegex("gallery_*_" + creatorIpHash)
-	let galleryItem = JSON.parse(galleryItemString);
+	const redis = new Redis(process.env.UPSTASH_REDIS_URL);
+	const keys = await redis.keys("gallery_*_" + creatorIpHash);
+	const galleryItems = await redis.mget(...keys);
 
-	if (!galleryItem.upvotes) {
-		galleryItem.upvotes = [];
+	let galleryItem;
+	for (const itemStr of galleryItems) {
+		const parsedItem = JSON.parse(itemStr);
+		if (parsedItem.sessionId === sessionId && parsedItem.version === version) {
+			galleryItem = parsedItem;
+			break;
+		}
 	}
 
-	return galleryItem.upvotes.length;
+	if (!galleryItem) throw new Error("Gallery item not found");
+
+	return galleryItem.upvotes?.length || 0;
 }

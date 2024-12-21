@@ -1,12 +1,12 @@
 import { ThumbsUp } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-hot-toast";
 
 export function UpvoteButton({
   sessionId,
   version,
-  initialUpvotes = 0,
+  initialUpvotes = -1,
 }: {
   sessionId: string;
   version: string;
@@ -14,6 +14,28 @@ export function UpvoteButton({
 }) {
   const [upvotes, setUpvotes] = useState(initialUpvotes);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchUpvotes = async () => {
+      try {
+        const response = await fetch(`/api/apps/${sessionId}/${version}/upvote`, {
+          method: "GET",
+        });
+        
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.error || "Failed to fetch upvotes");
+        }
+        
+        const data = await response.json();
+        setUpvotes(data.upvotes);
+      } catch (error) {
+        console.error("Failed to fetch upvotes:", error);
+      }
+    };
+
+    fetchUpvotes();
+  }, [sessionId, version]);
 
   const handleUpvote = async () => {
     setIsLoading(true);
@@ -49,7 +71,13 @@ export function UpvoteButton({
         onClick={handleUpvote}
         disabled={isLoading}
       >
-        <ThumbsUp /> {upvotes}
+        {upvotes === -1 ? (
+          <span className="animate-pulse">Loading...</span>
+        ) : (
+          <>
+            <ThumbsUp /> {upvotes}
+          </>
+        )}
       </Button>
     </>
   );

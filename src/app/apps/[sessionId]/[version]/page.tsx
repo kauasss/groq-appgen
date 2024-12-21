@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { RemixButton } from "@/components/RemixButton";
-import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { ReportButton } from "@/app/components/report-button";
 import { UpvoteButton } from "@/app/components/upvote-button";
@@ -23,7 +22,6 @@ export default function SharedApp({
 }) {
 	const [html, setHtml] = useState("");
 	const [showWarning, setShowWarning] = useState(true);
-	const { theme } = useTheme();
 
 	useEffect(() => {
 		const fetchHtml = async () => {
