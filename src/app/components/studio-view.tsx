@@ -216,7 +216,7 @@ function HomeContent() {
 									className="underline"
 									href="https://console.groq.com/docs/models"
 								>
-									Try Groq now!
+									Build with Groq!
 								</a>
 							</span>
 						)}
