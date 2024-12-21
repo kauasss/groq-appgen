@@ -20,6 +20,7 @@ import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import AppLogo from "@/components/AppLogo";
 import { useTheme } from "next-themes";
+import { cn } from "@/lib/utils";
 
 export default function StudioView() {
 	return (
@@ -46,6 +47,8 @@ function HomeContent() {
 		setMode,
 		sessionId,
 		setStudioMode,
+		isApplying,
+		isGenerating,
 	} = useStudio();
 	const { resolvedTheme } = useTheme();
 
@@ -89,7 +92,15 @@ function HomeContent() {
 			};
 			loadSourceVersion();
 		}
-	}, [searchParams, sessionId, setCurrentHtml, setHistory, setHistoryIndex, setMode, setStudioMode]);
+	}, [
+		searchParams,
+		sessionId,
+		setCurrentHtml,
+		setHistory,
+		setHistoryIndex,
+		setMode,
+		setStudioMode,
+	]);
 
 	return (
 		<main className="h-screen flex flex-col overflow-hidden">
@@ -132,6 +143,12 @@ function HomeContent() {
 				{/* Left Column - Code View */}
 				<div className="w-1/2 p-4 border-r overflow-auto lg:block hidden">
 					<div className="relative h-full">
+						<div
+							className={cn(
+								"absolute top-0 left-0 h-[2px] bg-groq animate-loader",
+								isGenerating || isApplying ? "opacity-100" : "opacity-0",
+							)}
+						/>
 						<SyntaxHighlighter
 							language="html"
 							style={resolvedTheme === "dark" ? vscDarkPlus : vs}
@@ -196,7 +213,9 @@ function HomeContent() {
 			<div className="flex flex-col md:flex-row w-full max-w-3xl mx-auto px-4 md:px-0">
 				{/* Logo section */}
 				<div className="md:w-1/2 md:pr-4 md:border-r flex items-center justify-center md:justify-end py-2">
-					<span className="hidden md:inline text-sm text-muted-foreground">Powered by</span>
+					<span className="hidden md:inline text-sm text-muted-foreground">
+						Powered by
+					</span>
 					<AppLogo className="scale-75" size={100} />
 				</div>
 				{/* Stats section */}
@@ -207,7 +226,7 @@ function HomeContent() {
 								{(history[historyIndex].usage.total_time * 1000).toFixed(0)}ms •{" "}
 								{Math.round(
 									history[historyIndex].usage.total_tokens /
-										history[historyIndex].usage.total_time
+										history[historyIndex].usage.total_time,
 								)}{" "}
 								tokens/sec •{" "}
 								<a

@@ -4,11 +4,15 @@ import { constructPrompt } from "@/utils/prompt";
 import { signHtml } from "@/server/signing";
 import {
 	PRIMARY_MODEL,
+	VANILLA_MODEL,
 	PRIMARY_VISION_MODEL,
 	FALLBACK_VISION_MODEL,
 	getFallbackModel,
 } from "@/utils/model-selection";
-import { MAINTENANCE_GENERATION } from "@/lib/settings";
+import {
+	MAINTENANCE_GENERATION,
+	MAINTENANCE_USE_VANILLA_MODEL,
+} from "@/lib/settings";
 
 const client = new Groq({
 	apiKey: process.env.GROQ_API_KEY,
@@ -80,7 +84,10 @@ async function tryCompletion(prompt: string, model: string) {
 
 async function generateWithFallback(prompt: string) {
 	try {
-		const chatCompletion = await tryCompletion(prompt, PRIMARY_MODEL);
+		const chatCompletion = await tryCompletion(
+			prompt,
+			MAINTENANCE_USE_VANILLA_MODEL ? VANILLA_MODEL : PRIMARY_MODEL,
+		);
 		return chatCompletion;
 	} catch (error) {
 		console.error("Primary model failed, trying fallback model:", error);

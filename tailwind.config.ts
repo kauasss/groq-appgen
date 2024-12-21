@@ -9,6 +9,9 @@ const config: Config = {
 	],
 	theme: {
 		extend: {
+			animation: {
+				loader: "loader 500ms linear infinite",
+			},
 			borderRadius: {
 				lg: "var(--radius)",
 				md: "calc(var(--radius) - 2px)",
@@ -61,6 +64,13 @@ const config: Config = {
 					"3": "hsl(var(--chart-3))",
 					"4": "hsl(var(--chart-4))",
 					"5": "hsl(var(--chart-5))",
+				},
+			},
+			keyframes: {
+				loader: {
+					"0%": { left: "0", width: "0" },
+					"50%": { left: "0", width: "100%" },
+					"100%": { left: "100%", width: "0" },
 				},
 			},
 		},
