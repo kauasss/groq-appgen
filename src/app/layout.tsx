@@ -5,6 +5,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ROOT_URL } from "@/utils/config";
 import { ModeToggle } from "@/components/mode-toggle";
+import { GoogleAnalytics } from '@next/third-parties/google';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -38,6 +39,7 @@ export default function RootLayout({
 					<ModeToggle />
 					<Toaster position="bottom-right" />
 				</ThemeProvider>
+				<GoogleAnalytics gaId="G-MGQ7E93R12" />
 			</body>
 		</html>
 	);
