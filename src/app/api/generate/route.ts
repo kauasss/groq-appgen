@@ -2,7 +2,13 @@ import { NextResponse } from "next/server";
 import Groq from "groq-sdk";
 import { constructPrompt } from "@/utils/prompt";
 import { signHtml } from "@/server/signing";
-import { PRIMARY_MODEL, PRIMARY_VISION_MODEL, FALLBACK_VISION_MODEL, getFallbackModel } from '@/utils/model-selection';
+import {
+	PRIMARY_MODEL,
+	PRIMARY_VISION_MODEL,
+	FALLBACK_VISION_MODEL,
+	getFallbackModel,
+} from "@/utils/model-selection";
+import { MAINTENANCE_GENERATION } from "@/lib/settings";
 
 const client = new Groq({
 	apiKey: process.env.GROQ_API_KEY,
@@ -61,40 +67,46 @@ async function tryVisionCompletion(imageData: string, model: string) {
 }
 
 async function tryCompletion(prompt: string, model: string) {
-  return await client.chat.completions.create({
-    messages: [{ role: "user", content: prompt }],
-    model: model,
-    temperature: 0.1,
-    max_tokens: 2000,
-    top_p: 1,
-    stream: false,
-    stop: null,
-  });
+	return await client.chat.completions.create({
+		messages: [{ role: "user", content: prompt }],
+		model: model,
+		temperature: 0.1,
+		max_tokens: 2000,
+		top_p: 1,
+		stream: false,
+		stop: null,
+	});
 }
 
 async function generateWithFallback(prompt: string) {
-  try {
-    const chatCompletion = await tryCompletion(prompt, PRIMARY_MODEL);
-    return chatCompletion;
-  } catch (error) {
-    console.error('Primary model failed, trying fallback model:', error);
-    try {
-      const chatCompletion = await tryCompletion(prompt, getFallbackModel());
-      return chatCompletion;
-    } catch (error) {
-      console.error("Error generating completion:", error);
-      throw error;
-    }
-  }
+	try {
+		const chatCompletion = await tryCompletion(prompt, PRIMARY_MODEL);
+		return chatCompletion;
+	} catch (error) {
+		console.error("Primary model failed, trying fallback model:", error);
+		try {
+			const chatCompletion = await tryCompletion(prompt, getFallbackModel());
+			return chatCompletion;
+		} catch (error) {
+			console.error("Error generating completion:", error);
+			throw error;
+		}
+	}
 }
 
 async function getDrawingDescription(imageData: string): Promise<string> {
 	try {
-		const chatCompletion = await tryVisionCompletion(imageData, PRIMARY_VISION_MODEL);
+		const chatCompletion = await tryVisionCompletion(
+			imageData,
+			PRIMARY_VISION_MODEL,
+		);
 		return chatCompletion.choices[0].message.content;
 	} catch (error) {
 		try {
-			const chatCompletion = await tryVisionCompletion(imageData, FALLBACK_VISION_MODEL);
+			const chatCompletion = await tryVisionCompletion(
+				imageData,
+				FALLBACK_VISION_MODEL,
+			);
 			return chatCompletion.choices[0].message.content;
 		} catch (error) {
 			console.error("Error processing drawing:", error);
@@ -104,6 +116,13 @@ async function getDrawingDescription(imageData: string): Promise<string> {
 }
 
 export async function POST(request: Request) {
+	if (MAINTENANCE_GENERATION) {
+		return NextResponse.json(
+			{ error: "We're currently undergoing maintenance. We'll be back soon!" },
+			{ status: 500 },
+		);
+	}
+
 	try {
 		const { query, currentHtml, feedback, theme, drawingData } =
 			await request.json();
