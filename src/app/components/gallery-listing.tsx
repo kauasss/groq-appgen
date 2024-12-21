@@ -20,7 +20,10 @@ interface GalleryListingProps {
 	view?: "trending" | "popular" | "new";
 }
 
-export function GalleryListing({ limit, view = "popular" }: GalleryListingProps) {
+export function GalleryListing({
+	limit,
+	view = "popular",
+}: GalleryListingProps) {
 	const { data: gallery, isLoading } = useSWR<GalleryItemWithUpvotes[]>(
 		view ? `/api/apps?view=${view}` : null,
 		async (url) => {
@@ -33,7 +36,7 @@ export function GalleryListing({ limit, view = "popular" }: GalleryListingProps)
 		{
 			revalidateOnFocus: false,
 			dedupingInterval: 30000, // Match the server-side cache of 30 seconds
-		}
+		},
 	);
 
 	if (isLoading) {
@@ -47,7 +50,9 @@ export function GalleryListing({ limit, view = "popular" }: GalleryListingProps)
 	if (!gallery?.length) {
 		return (
 			<div className="text-center text-gray-500 py-8">
-				{view === "trending" ? "No trending apps in the last 24 hours" : "No apps found"}
+				{view === "trending"
+					? "No trending apps in the last 24 hours"
+					: "No apps found"}
 			</div>
 		);
 	}
@@ -62,7 +67,7 @@ export function GalleryListing({ limit, view = "popular" }: GalleryListingProps)
 					<Link
 						href={`/apps/${item.sessionId}/${item.version}`}
 						target="_blank"
-						className="block"
+						className="block w-[150px] md:w-[200px] xl:w-[250px]"
 					>
 						<div
 							className={cn(
@@ -76,7 +81,9 @@ export function GalleryListing({ limit, view = "popular" }: GalleryListingProps)
 						<div className="p-2 flex flex-col gap-2">
 							<div className="flex justify-between items-start gap-2">
 								<div className="flex-1 min-w-0">
-									<div className="text-sm truncate" title={item.title}>{item.title}</div>
+									<div className="text-sm truncate" title={item.title}>
+										{item.title}
+									</div>
 								</div>
 								<div className="flex items-center gap-1 text-sm opacity-70 shrink-0">
 									<ThumbsUp size={14} />
