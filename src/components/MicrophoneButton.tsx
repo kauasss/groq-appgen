@@ -4,9 +4,13 @@ import { Mic } from "lucide-react";
 
 interface MicrophoneButtonProps {
 	onTranscription: (text: string) => void;
+	disabled?: boolean;
 }
 
-export function MicrophoneButton({ onTranscription }: MicrophoneButtonProps) {
+export function MicrophoneButton({
+	onTranscription,
+	disabled,
+}: MicrophoneButtonProps) {
 	const [isRecording, setIsRecording] = useState(false);
 	const mediaRecorder = useRef(null);
 	const audioChunks = useRef([]);
@@ -73,6 +77,7 @@ export function MicrophoneButton({ onTranscription }: MicrophoneButtonProps) {
 	return (
 		<div className="relative">
 			<Button
+				disabled={disabled}
 				type="button"
 				variant="ghost"
 				size="icon"
