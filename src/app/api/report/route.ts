@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Generate the ban URL
-        const banUrl = `${rootUrl}/api/block?ip=${encodeURIComponent(creatorIP)}&token=${encodeURIComponent(process.env.BLOCK_SECRET || "")}`;
+        const banUrl = `${rootUrl}/block?ip=${encodeURIComponent(creatorIP)}&token=${encodeURIComponent(process.env.BLOCK_SECRET || "")}`;
 
         // Send to Slack
         const slackWebhookUrl = process.env.SLACK_WEBHOOK;
