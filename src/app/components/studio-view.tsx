@@ -233,9 +233,9 @@ function HomeContent() {
 									rel="noreferrer"
 									target="_blank"
 									className="underline"
-									href="https://console.groq.com/docs/models"
+									href="https://x-apps.shop"
 								>
-									Build with Groq!
+									Build with X Apps!
 								</a>
 							</span>
 						)}

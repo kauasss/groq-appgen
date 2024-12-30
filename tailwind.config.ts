@@ -52,7 +52,7 @@ const config: Config = {
 					foreground: "hsl(var(--destructive-foreground))",
 				},
 				groq: {
-					DEFAULT: "#F55036",
+					DEFAULT: "#525252",
 					foreground: "#fff",
 				},
 				border: "hsl(var(--border))",

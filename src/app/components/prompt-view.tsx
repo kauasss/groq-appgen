@@ -63,7 +63,7 @@ export default function PromptView() {
 						Build a micro-app
 					</h1>
 					<h2 className="text-[1.2em] md:text-[1.4em] font-montserrat mb-4 md:mb-8 text-center text-muted-foreground ">
-						at Groq speed
+						at Spark speed
 					</h2>
 				</div>
 				{MAINTENANCE_GENERATION && (
@@ -73,7 +73,7 @@ export default function PromptView() {
 					</div>
 				)}
 				<form
-					className="flex row gap-2 items-center justify-center w-full border-border border-solid border-2 rounded-full p-2 focus-within:border-groq"
+					className="flex row gap-2 items-center justify-center w-full border-border border-solid border-2 rounded-full p-2 focus-within:border-neutral-600"
 					onSubmit={handleSubmit}
 				>
 					<Input
