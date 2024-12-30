@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 		url: ROOT_URL,
 		title: "Spark",
 		description: "Interactive HTML editor with AI generation",
-		images: `${ROOT_URL}/og-labs.png`,
+		images: `${ROOT_URL}/og-labs.jpg`,
 	},
 };
 
