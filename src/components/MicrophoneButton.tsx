@@ -82,7 +82,7 @@ export function MicrophoneButton({
 				variant="ghost"
 				size="icon"
 				className={`rounded-full relative z-10 ${
-					isRecording ? "text-orange-500 hover:text-orange-600" : ""
+					isRecording ? "text-neutral-700 dark:text-neutral-200 hover:text-neutral-800 dark:hover:text-neutral-300" : ""
 				}`}
 				onClick={toggleRecording}
 			>
@@ -90,9 +90,9 @@ export function MicrophoneButton({
 			</Button>
 			{isRecording && (
 				<div className="absolute inset-0 z-0">
-					<div className="absolute inset-0 animate-ping rounded-full bg-orange-400 opacity-75" />
-					<div className="absolute inset-[-4px] animate-pulse rounded-full bg-orange-300 opacity-50" />
-					<div className="absolute inset-[-8px] animate-pulse delay-75 rounded-full bg-orange-200 opacity-25" />
+					<div className="absolute inset-0 animate-ping rounded-full bg-neutral-300 dark:bg-neutral-600 opacity-75" />
+					<div className="absolute inset-[-4px] animate-pulse rounded-full bg-neutral-200 dark:bg-neutral-400 opacity-50" />
+					<div className="absolute inset-[-8px] animate-pulse delay-75 rounded-full bg-neutral-100 dark:bg-neutral-800 opacity-25" />
 				</div>
 			)}
 		</div>
